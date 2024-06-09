@@ -1,0 +1,24 @@
+.nav-font {
+  font-family: "Outfit", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: normal;
+}
+
+.item {
+  padding-top: .2rem;
+  padding-bottom: .2rem;
+  padding-left: .7rem;
+  padding-right: .7rem;
+  border: #242424 2px solid;
+  transition: border 0.1s ease-in-out;
+}
+
+.item:hover {
+  cursor: pointer;
+  border: 2px rgb(255, 255, 255) solid;
+}
+
+.selected {
+  border: 2px rgb(255, 255, 255) solid;
+}

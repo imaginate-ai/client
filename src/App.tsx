@@ -2,6 +2,7 @@ import { FC, useState } from 'react'
 import './App.css'
 import { PhotoQueueProps } from './interfaces/PhotoQueueProps'
 import { testImages } from './testData'
+import Navbar from './navigation/Navbar';
 
 const PhotoQueue: FC<PhotoQueueProps> = ({ images }): JSX.Element => {
   const [index, setIndex] = useState(0);
@@ -48,9 +49,12 @@ const PhotoQueue: FC<PhotoQueueProps> = ({ images }): JSX.Element => {
 function App() {
 
   return (
-    <div className='w-screen h-screen flex justify-center'>
+    <div className='w-screen h-screen'>
+      <Navbar />
+      <div className='page-content flex justify-center'>
+        <PhotoQueue images={testImages} />
+      </div>
 
-      <PhotoQueue images={testImages} />
 
     </div>
   )
