@@ -4,7 +4,7 @@ import { PhotoQueueProps } from './interfaces/PhotoQueueProps'
 import { testImages } from './testData'
 import Navbar from './navigation/Navbar';
 
-const PhotoQueue: FC<PhotoQueueProps> = ({ images }): JSX.Element => {
+const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
   const [index, setIndex] = useState(0);
 
   const makeChoice = (choseGenerated: boolean) => {
