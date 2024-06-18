@@ -1,4 +1,4 @@
-import { FC, useState } from 'react'
+import { useState } from 'react'
 import './App.css'
 import { PhotoQueueProps } from './interfaces/PhotoQueueProps'
 import { testImages } from './testData'
