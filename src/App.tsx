@@ -188,6 +188,8 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
 function App() {
   const { darkAlgorithm } = theme;
 
+  const { darkAlgorithm } = theme;
+
   return (
     <div className='h-full'>
       <ConfigProvider
