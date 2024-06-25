@@ -3,24 +3,29 @@ import './App.css'
 import { PhotoQueueProps } from './interfaces/PhotoQueueProps'
 import { testImages } from './testData'
 import Navbar from './navigation/Navbar';
+import { ConfigProvider, theme, Modal } from 'antd';
 
 const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
+  const [score, setScore] = useState(0);
   const [index, setIndex] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
 
   const makeChoice = (choseGenerated: boolean) => {
 
     const correctChoice = (choseGenerated == images[index].generated)
 
     if (correctChoice) {
-      console.log("Correct!")
-      //increase score
+      setScore(score + 1);
     }
 
     if (index < images.length - 1) {
       setIndex(index + 1)
     } else {
-      //handle game over
+      setIsModalOpen(true);
     }
+
+
 
   };
 
@@ -41,6 +46,16 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
           </svg>
         </button>
       </div>
+      <Modal title="Well Played!" open={isModalOpen} footer={[
+        <button>
+          Share
+        </button>
+      ]}
+        onCancel={() => setIsModalOpen(false)}
+      >
+        <p>You got {score} out of 5 correct!</p>
+      </Modal >
+
     </div>
   )
 }
@@ -48,14 +63,21 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
 
 function App() {
 
+  const { darkAlgorithm } = theme;
+
   return (
+
     <div className='w-screen h-screen'>
-      <Navbar />
-      <div className='page-content flex justify-center'>
-        <PhotoQueue images={testImages} />
-      </div>
+      <ConfigProvider
+        theme={{
+          algorithm: darkAlgorithm,
+        }}>
 
-
+        <Navbar />
+        <div className='page-content flex justify-center'>
+          <PhotoQueue images={testImages} />
+        </div>
+      </ConfigProvider>
     </div>
   )
 }
