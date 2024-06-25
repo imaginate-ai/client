@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "antd": "^5.18.3",
     "autoprefixer": "^10.4.19",
     "postcss-cli": "^11.0.0",
     "react": "^18.2.0",
