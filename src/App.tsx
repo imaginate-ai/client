@@ -145,6 +145,18 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
     }, 1000);
   };
 
+  let answers = images.map((image) => {
+    let generatedText;
+    if (image.generated) {
+      generatedText = "AI"
+    } else {
+      generatedText = "Real"
+    }
+    return <div><img className="rounded-lg" src={image.url} /><p>{generatedText}</p></div>
+  }
+  );
+
+
   return (
     <div className='w-10/12 h-full'>
       <div className='flex justify-center'>
@@ -184,6 +196,7 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
     </div>
   );
 };
+
 
 function App() {
   const { darkAlgorithm } = theme;

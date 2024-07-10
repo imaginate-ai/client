@@ -53,6 +53,10 @@ button {
   font-size: 40px !important;
 }
 
+.text-body {
+  font: outfit;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
