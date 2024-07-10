@@ -88,6 +88,8 @@ const PhotoQueueButtons = ({
   );
 };
 
+const apiUrl = 'http://127.0.0.1:5000'
+
 const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
   const [score, setScore] = useState(0);
   const [index, setIndex] = useState(0);
@@ -175,6 +177,17 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
       shareButton.current.textContent = 'Score coppied to clipboard!';
     }
   };
+  let apiTest;
+  const getPhotos = async () => {
+    const dateBody = await fetch(apiUrl + "/date/latest").then((res) => res.json());
+    const date = dateBody.date;
+    const imageBody: any[] = await fetch(apiUrl + `/date/${date}/images`).then((res) => res.json());
+    const apiImages: any[] = imageBody.map(
+      async (image) => await fetch(apiUrl + image.url)
+        .then((response) => response.json())
+    );
+    apiTest = await apiImages.map(((body) => <img src={'data:image/png;base64, ' + body.url} />));
+  }
 
   return (
     <div className='w-10/12 h-full'>
