@@ -10,6 +10,8 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
   const [index, setIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const [scoreText, setScoreText] = useState('');
+
 
   const makeChoice = (choseGenerated: boolean) => {
 
@@ -17,43 +19,56 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
 
     if (correctChoice) {
       setScore(score + 1);
+      setScoreText(scoreText + "🟩")
+    } else {
+      setScoreText(scoreText + "🟥");
     }
 
     if (index < images.length - 1) {
-      setIndex(index + 1)
+      setIndex(index + 1);
     } else {
       setIsModalOpen(true);
     }
 
-
-
   };
 
+  let answers = images.map((image) => {
+    let generatedText;
+    if (image.generated) {
+      generatedText = "AI"
+    } else {
+      generatedText = "Real"
+    }
+    return <div><img className="rounded-lg" src={image.url} /><p>{generatedText}</p></div>
+  }
+  );
+
+
   return (
-    <div className='w-10/12 h-full mt-10'>
-      <div className='flex justify-center max-h-1/2'>
-        <img className='w-auto mb-2 rounded-lg h-full' src={images[index].url} />
+    <div className='w-10/12 h-full'>
+      <div className='flex justify-center max'>
+        <img className='w-auto mb-2 rounded-lg h-full' src={images[index].url}>
+        </img>
       </div>
-      <div className='block h-1/3'>
-        <button className='w-full mb-2' onClick={() => { makeChoice(false) }}>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
-          </svg>
+      <div className='flex flex-row gap-2'>
+        <button className='w-full mb-2 text-body' onClick={() => { makeChoice(false) }}>
+          Real
         </button>
-        <button className='w-full mb-2' onClick={() => { makeChoice(true) }}>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-            <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-          </svg>
+        <button className='w-full mb-2 text-body' onClick={() => { makeChoice(true) }}>
+          AI
         </button>
       </div>
-      <Modal title="Well Played!" open={isModalOpen} footer={[
-        <button>
+      <Modal title="Well Played!" open={isModalOpen} width={'80vw'} footer={[
+        <button onClick={() => navigator.clipboard.writeText("Imaginate " + scoreText)}>
           Share
         </button>
       ]}
         onCancel={() => setIsModalOpen(false)}
-      >
-        <p>You got {score} out of 5 correct!</p>
+      > <div className="text-center grid gap-6 grid-cols-1">
+          <p>You got {score} out of {images.length} correct!</p>
+          <div className="flex gap-4">{answers}</div>
+          <p>{scoreText}</p>
+        </div>
       </Modal >
 
     </div>
@@ -61,24 +76,24 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
 }
 
 
+
 function App() {
 
   const { darkAlgorithm } = theme;
 
   return (
-
-    <div className='w-screen h-screen'>
+    <>
       <ConfigProvider
         theme={{
           algorithm: darkAlgorithm,
         }}>
 
         <Navbar />
-        <div className='page-content flex justify-center'>
+        <div className='page-content self-center my-auto'>
           <PhotoQueue images={testImages} />
         </div>
       </ConfigProvider>
-    </div>
+    </>
   )
 }
 
