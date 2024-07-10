@@ -1,8 +1,10 @@
-import { FC, useState } from 'react'
+import { useState } from 'react'
 import './App.css'
 import { PhotoQueueProps } from './interfaces/PhotoQueueProps'
 import { testImages } from './testData'
 import Navbar from './navigation/Navbar';
+
+const apiUrl = 'http://127.0.0.1:5000'
 
 const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
   const [index, setIndex] = useState(0);
@@ -24,6 +26,11 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
 
   };
 
+  const  getPhotos = async ()=>{
+    const date = await fetch(apiUrl + "/date/latest");
+    console.log(date);
+  }
+
   return (
     <div className='w-10/12 h-full mt-10'>
       <div className='flex justify-center max-h-1/2'>
@@ -41,6 +48,7 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
           </svg>
         </button>
       </div>
+      <button onClick={getPhotos}>test</button>
     </div>
   )
 }
