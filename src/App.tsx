@@ -1,36 +1,71 @@
-import { useState } from 'react'
+import { useState, JSX } from 'react'
 import './App.css'
-import { PhotoQueueProps } from './interfaces/PhotoQueueProps'
+import { PhotoQueueProps, PhotoQueueButtonProps } from './interfaces/PhotoQueueProps'
 import { testImages } from './testData'
 import Navbar from './navigation/Navbar';
-import { ConfigProvider, theme, Modal } from 'antd';
+import { ConfigProvider, theme, Modal, Button } from 'antd';
+
+const PhotoQueueButton = ({onClick, children, color}: PhotoQueueButtonProps): JSX.Element => {
+  let useColor: string;
+  if(color === 'primary'){
+    useColor = '';
+  } else {
+    useColor = color;
+  }
+  
+  const [buttonColor, setButtonColor] = useState(useColor);
+
+  const clickHandler = () =>{
+    setButtonColor(onClick(children));
+  }
+
+  console.log(!!buttonColor, buttonColor);
+
+  return (
+    <Button color='warn' className={'mb-2 text-body ' + buttonColor} onClick={() =>clickHandler()} disabled={!!buttonColor}>
+          {children}
+    </Button>
+  )
+}
 
 const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
   const [score, setScore] = useState(0);
   const [index, setIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const [scoreText, setScoreText] = useState('');
 
+  
 
   const makeChoice = (choseGenerated: boolean) => {
 
-    const correctChoice = (choseGenerated == images[index].generated)
+    const isCorrectChoice = (choseGenerated == images[index].generated)
 
-    if (correctChoice) {
+    if (isCorrectChoice) {
       setScore(score + 1);
-      setScoreText(scoreText + "🟩")
+      setScoreText(scoreText + "🟩");
     } else {
       setScoreText(scoreText + "🟥");
     }
 
     if (index < images.length - 1) {
-      setIndex(index + 1);
+      setTimeout(()=>{
+        setIndex(index + 1);
+      }, 750);
+      return giveFeedback(isCorrectChoice);
     } else {
       setIsModalOpen(true);
+      return ''
     }
 
   };
+
+  const giveFeedback = (isCorrectChoice: boolean) => {
+    if(isCorrectChoice){
+      return 'green-700';
+    } else {
+      return 'red-700';
+    }
+  }
 
   let answers = images.map((image) => {
     let generatedText;
@@ -39,7 +74,7 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
     } else {
       generatedText = "Real"
     }
-    return <div><img className="rounded-lg" src={image.url} /><p>{generatedText}</p></div>
+    return <div><img className="rounded-lg" key={image.url} src={image.url} /><p>{generatedText}</p></div>
   }
   );
 
@@ -51,12 +86,9 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
         </img>
       </div>
       <div className='flex flex-row gap-2'>
-        <button className='w-full mb-2 text-body' onClick={() => { makeChoice(false) }}>
-          Real
-        </button>
-        <button className='w-full mb-2 text-body' onClick={() => { makeChoice(true) }}>
-          AI
-        </button>
+        
+        <PhotoQueueButton onClick={makeChoice} color={'primary'}>Real</PhotoQueueButton>
+        <PhotoQueueButton onClick={makeChoice} color={'primary'}>AI</PhotoQueueButton>
       </div>
       <Modal title="Well Played!" open={isModalOpen} width={'80vw'} footer={[
         <button onClick={() => navigator.clipboard.writeText("Imaginate " + scoreText)}>
