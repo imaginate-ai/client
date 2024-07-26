@@ -1,11 +1,10 @@
-import { Image } from "./imageInterface";
+import { Image } from "./ImageInterface";
 
 export interface PhotoQueueProps {
   images: Image[],
 }
 
 export interface PhotoQueueButtonProps {
-  children: string;
-  color: string;
-  onClick: Function;
+  disabled: boolean;
+  makeChoice: Function;
 }

@@ -1,30 +1,91 @@
-import { useState, JSX } from 'react'
+import { useState, JSX, useRef } from 'react'
 import './App.css'
 import { PhotoQueueProps, PhotoQueueButtonProps } from './interfaces/PhotoQueueProps'
 import { testImages } from './testData'
 import Navbar from './navigation/Navbar';
 import { ConfigProvider, theme, Modal, Button } from 'antd';
 
-const PhotoQueueButton = ({onClick, children, color}: PhotoQueueButtonProps): JSX.Element => {
-  let useColor: string;
-  if(color === 'primary'){
-    useColor = '';
-  } else {
-    useColor = color;
-  }
-  
-  const [buttonColor, setButtonColor] = useState(useColor);
 
-  const clickHandler = () =>{
-    setButtonColor(onClick(children));
+const PhotoQueueButtons = ({ makeChoice, disabled }: PhotoQueueButtonProps): JSX.Element => {
+
+
+  const AiButton = useRef<HTMLElement>(null)
+  const RealButton = useRef<HTMLElement>(null)
+  const [oldButtonBackgroundColor, setOldButtonBackgroundColor] = useState('');
+
+  const clickHandler = (target: HTMLElement) => {
+    let choseGenerated = false;
+    setOldButtonBackgroundColor(target.style.backgroundColor)
+
+    if (!(AiButton?.current && RealButton?.current)) {
+      return
+    }
+
+
+    if (target.textContent === 'A.I.') {
+      RealButton.current.setAttribute('disabled', 'true')
+      choseGenerated = true;
+    } else {
+      AiButton.current.setAttribute('disabled', 'true')
+    }
+
+    const isCorrectChoice = makeChoice(choseGenerated, choiceCallBack)
+
+
+
+    if (choseGenerated && isCorrectChoice) {
+      AiButton.current.style.backgroundColor = 'green'
+      RealButton.current.style.backgroundColor = 'red'
+    } else if (choseGenerated && !isCorrectChoice) {
+      AiButton.current.style.backgroundColor = 'red'
+      RealButton.current.style.backgroundColor = 'green'
+    } else if (!choseGenerated && isCorrectChoice) {
+      AiButton.current.style.backgroundColor = 'red'
+      RealButton.current.style.backgroundColor = 'green'
+    } else {
+      AiButton.current.style.backgroundColor = 'green'
+      RealButton.current.style.backgroundColor = 'red'
+    }
+
+
   }
 
-  console.log(!!buttonColor, buttonColor);
+  const choiceCallBack = () => {
+    if (AiButton?.current && RealButton?.current) {
+      buttonsDisabled(false)
+      AiButton.current.style.backgroundColor = oldButtonBackgroundColor
+      RealButton.current.style.backgroundColor = oldButtonBackgroundColor
+    }
+  }
+
+  const buttonsDisabled = (value: boolean) => {
+    console.log(value)
+    if (AiButton?.current && RealButton?.current) {
+      if (value) {
+        AiButton.current.setAttribute('disabled', 'true')
+        RealButton.current.setAttribute('disabled', 'true')
+      } else {
+        AiButton.current.removeAttribute('disabled')
+        RealButton.current.removeAttribute('disabled')
+      }
+    }
+  }
+
+  if (disabled) {
+    buttonsDisabled(true)
+  }
 
   return (
-    <Button color='warn' className={'mb-2 text-body ' + buttonColor} onClick={() =>clickHandler()} disabled={!!buttonColor}>
-          {children}
-    </Button>
+    <>
+      <div className='flex flex-row gap-2 h-16'>
+        <Button ref={AiButton} type="primary" className={'choiceButton mb-2 w-full h-full text-body'} onClick={(event) => clickHandler(event.target as HTMLElement)}>
+          A.I.
+        </Button>
+        <Button ref={RealButton} type="primary" className={'choiceButton mb-2 w-full h-full text-body'} onClick={(event) => clickHandler(event.target as HTMLElement)}>
+          Real
+        </Button>
+      </div>
+    </>
   )
 }
 
@@ -33,11 +94,11 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
   const [index, setIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [scoreText, setScoreText] = useState('');
+  const [disableButtons, setDisableButtons] = useState(false)
+  const shareButton = useRef<HTMLElement>(null);
 
-  
 
-  const makeChoice = (choseGenerated: boolean) => {
-
+  const makeChoice = (choseGenerated: boolean, choiceCallBack: Function) => {
     const isCorrectChoice = (choseGenerated == images[index].generated)
 
     if (isCorrectChoice) {
@@ -47,25 +108,19 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
       setScoreText(scoreText + "🟥");
     }
 
-    if (index < images.length - 1) {
-      setTimeout(()=>{
+    setTimeout(() => {
+      if (index < images.length - 1) {
         setIndex(index + 1);
-      }, 750);
-      return giveFeedback(isCorrectChoice);
-    } else {
-      setIsModalOpen(true);
-      return ''
-    }
+      } else {
+        setIsModalOpen(true);
+        setDisableButtons(true)
+      }
+      choiceCallBack()
+    }, 750);
+
+    return isCorrectChoice;
 
   };
-
-  const giveFeedback = (isCorrectChoice: boolean) => {
-    if(isCorrectChoice){
-      return 'green-700';
-    } else {
-      return 'red-700';
-    }
-  }
 
   let answers = images.map((image) => {
     let generatedText;
@@ -75,25 +130,32 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
       generatedText = "Real"
     }
     return <div><img className="rounded-lg" key={image.url} src={image.url} /><p>{generatedText}</p></div>
-  }
-  );
+  });
 
+
+  const shareButtonCopy = () => {
+    navigator.clipboard.writeText("Imaginate " + scoreText);
+    shareButton.current?.setAttribute('loading', '1000')
+    setInterval(() => {
+      shareButton.current?.setAttribute('disabled', 'true')
+      if (shareButton.current?.textContent) {
+        shareButton.current.textContent = "Copied to clipboard!"
+      }
+    }, 1000)
+
+  }
 
   return (
     <div className='w-10/12 h-full'>
-      <div className='flex justify-center max'>
+      <div className='flex justify-center'>
         <img className='w-auto mb-2 rounded-lg h-full' src={images[index].url}>
         </img>
       </div>
-      <div className='flex flex-row gap-2'>
-        
-        <PhotoQueueButton onClick={makeChoice} color={'primary'}>Real</PhotoQueueButton>
-        <PhotoQueueButton onClick={makeChoice} color={'primary'}>AI</PhotoQueueButton>
-      </div>
+      <PhotoQueueButtons makeChoice={makeChoice} disabled={disableButtons}></PhotoQueueButtons>
       <Modal title="Well Played!" open={isModalOpen} width={'80vw'} footer={[
-        <button onClick={() => navigator.clipboard.writeText("Imaginate " + scoreText)}>
+        <Button ref={shareButton} type='default' onClick={() => shareButtonCopy()}>
           Share
-        </button>
+        </Button>
       ]}
         onCancel={() => setIsModalOpen(false)}
       > <div className="text-center grid gap-6 grid-cols-1">
@@ -114,18 +176,17 @@ function App() {
   const { darkAlgorithm } = theme;
 
   return (
-    <>
+    <div className='h-full'>
       <ConfigProvider
         theme={{
           algorithm: darkAlgorithm,
         }}>
-
         <Navbar />
-        <div className='page-content self-center my-auto'>
+        <div className='flex justify-center'>
           <PhotoQueue images={testImages} />
         </div>
       </ConfigProvider>
-    </>
+    </div>
   )
 }
 
