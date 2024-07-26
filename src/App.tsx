@@ -25,10 +25,16 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
     }
 
   };
-
-  const  getPhotos = async ()=>{
-    const date = await fetch(apiUrl + "/date/latest");
-    console.log(date);
+  let apiTest;
+  const getPhotos = async () => {
+    const dateBody = await fetch(apiUrl + "/date/latest").then((res) => res.json());
+    const date = dateBody.date;
+    const imageBody: any[] = await fetch(apiUrl + `/date/${date}/images`).then((res) => res.json());
+    const apiImages: any[] = imageBody.map(
+      async (image) => await fetch(apiUrl + image.url)
+        .then((response) => response.json())
+    );
+    apiTest = await apiImages.map(((body) => <img src={'data:image/png;base64, ' + body.url} />));
   }
 
   return (
@@ -49,6 +55,7 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
         </button>
       </div>
       <button onClick={getPhotos}>test</button>
+      {apiTest}
     </div>
   )
 }
@@ -62,8 +69,6 @@ function App() {
       <div className='page-content flex justify-center'>
         <PhotoQueue images={testImages} />
       </div>
-
-
     </div>
   )
 }
