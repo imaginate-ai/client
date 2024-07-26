@@ -145,14 +145,6 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
     }, 1000);
   };
 
-  const giveFeedback = (isCorrectChoice: boolean) => {
-    if(isCorrectChoice){
-      return 'green-700';
-    } else {
-      return 'red-700';
-    }
-  }
-
   let answers = images.map((image) => {
     let generatedText;
     if (image.generated) {
@@ -161,9 +153,20 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
       generatedText = "Real"
     }
     return <div><img className="rounded-lg" key={image.url} src={image.url} /><p>{generatedText}</p></div>
-  }
-  );
+  });
 
+
+  const shareButtonCopy = () => {
+    navigator.clipboard.writeText("Imaginate " + scoreText);
+    shareButton.current?.setAttribute('loading', '1000')
+    setInterval(() => {
+      shareButton.current?.setAttribute('disabled', 'true')
+      if (shareButton.current?.textContent) {
+        shareButton.current.textContent = "Copied to clipboard!"
+      }
+    }, 1000)
+
+  }
 
   return (
     <div className='w-10/12 h-full'>
