@@ -145,6 +145,14 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
     }, 1000);
   };
 
+  const giveFeedback = (isCorrectChoice: boolean) => {
+    if(isCorrectChoice){
+      return 'green-700';
+    } else {
+      return 'red-700';
+    }
+  }
+
   let answers = images.map((image) => {
     let generatedText;
     if (image.generated) {
@@ -152,7 +160,7 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
     } else {
       generatedText = "Real"
     }
-    return <div><img className="rounded-lg" src={image.url} /><p>{generatedText}</p></div>
+    return <div><img className="rounded-lg" key={image.url} src={image.url} /><p>{generatedText}</p></div>
   }
   );
 
