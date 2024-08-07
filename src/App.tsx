@@ -95,14 +95,22 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
   const [scoreText, setScoreText] = useState('');
   const [disableButtons, setDisableButtons] = useState(false);
   const shareButton = useRef<HTMLElement>(null);
+  const imageContainer = useRef<HTMLElement>(null);
+  const image = useRef<HTMLElement>(null);
 
   const makeChoice = (choseGenerated: boolean, choiceCallBack: Function) => {
     const isCorrectChoice = choseGenerated == images[index].generated;
 
     if (isCorrectChoice) {
       setScore(score + 1);
+      if (imageContainer.current?.style?.backgroundColor) {
+        imageContainer.current.style.backgroundColor = '#00800014';
+      }
       setScoreText(scoreText + '🟩');
     } else {
+      if (imageContainer.current?.style?.backgroundColor) {
+        imageContainer.current.style.backgroundColor = '#ff000014';
+      }
       setScoreText(scoreText + '🟥');
     }
 
@@ -112,6 +120,9 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
       } else {
         setIsModalOpen(true);
         setDisableButtons(true);
+      }
+      if (imageContainer.current?.style?.backgroundColor) {
+        imageContainer.current.style.backgroundColor = 'red';
       }
       choiceCallBack();
     }, 750);
@@ -170,9 +181,14 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
 
   return (
     <div className='w-10/12 h-full'>
-      <div className='flex justify-center'>
+      <div
+        ref={imageContainer}
+        className='flex justify-center'
+        style={{ backgroundColor: undefined }}
+      >
         <img
-          className='w-auto mb-2 rounded-lg h-full'
+          ref={image}
+          className='w-auto mb-2 mix-blend-overlay rounded-lg h-full'
           src={images[index].url}
         ></img>
       </div>
