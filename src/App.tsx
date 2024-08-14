@@ -1,4 +1,4 @@
-import { useState, JSX, useRef } from 'react';
+import { useState, JSX, useRef, ReactElement } from 'react';
 import './App.css';
 import {
   PhotoQueueProps,
@@ -7,7 +7,7 @@ import {
 import { testImages } from './testData';
 import Navbar from './navigation/Navbar';
 import { ConfigProvider, theme, Modal, Button } from 'antd';
-
+import { CloseOutlined, CheckOutlined } from '@ant-design/icons';
 const PhotoQueueButtons = ({
   makeChoice,
   disabled,
@@ -66,7 +66,7 @@ const PhotoQueueButtons = ({
 
   return (
     <>
-      <div className='flex flex-row gap-2 h-16'>
+      <div className='flex flex-row gap-8 h-16'>
         <Button
           ref={AiButton}
           type='primary'
@@ -95,23 +95,27 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
   const [scoreText, setScoreText] = useState('');
   const [disableButtons, setDisableButtons] = useState(false);
   const shareButton = useRef<HTMLElement>(null);
-  const imageContainer = useRef<HTMLElement>(null);
   const image = useRef<HTMLElement>(null);
+  const [feedbackOverlay, setFeedbackOverlay] = useState<ReactElement>();
 
   const makeChoice = (choseGenerated: boolean, choiceCallBack: Function) => {
     const isCorrectChoice = choseGenerated == images[index].generated;
 
     if (isCorrectChoice) {
       setScore(score + 1);
-      if (imageContainer.current?.style?.backgroundColor) {
-        imageContainer.current.style.backgroundColor = '#00800014';
-      }
       setScoreText(scoreText + '🟩');
+      setFeedbackOverlay(
+        <div className='absolute w-full h-full content-center text-center bg-green-500'>
+          <CheckOutlined className='text-9xl text-green-800' />
+        </div>,
+      );
     } else {
-      if (imageContainer.current?.style?.backgroundColor) {
-        imageContainer.current.style.backgroundColor = '#ff000014';
-      }
       setScoreText(scoreText + '🟥');
+      setFeedbackOverlay(
+        <div className=' absolute w-full h-full content-center text-center bg-red-500'>
+          <CloseOutlined className='text-9xl text-red-800' />
+        </div>,
+      );
     }
 
     setTimeout(() => {
@@ -121,9 +125,7 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
         setIsModalOpen(true);
         setDisableButtons(true);
       }
-      if (imageContainer.current?.style?.backgroundColor) {
-        imageContainer.current.style.backgroundColor = 'red';
-      }
+      setFeedbackOverlay(undefined);
       choiceCallBack();
     }, 750);
 
@@ -156,46 +158,24 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
     }, 1000);
   };
 
-  let answers = images.map((image) => {
-    let generatedText;
-    if (image.generated) {
-      generatedText = "AI"
-    } else {
-      generatedText = "Real"
-    }
-    return <div><img className="rounded-lg" key={image.url} src={image.url} /><p>{generatedText}</p></div>
-  });
-
-
-  const shareButtonCopy = () => {
-    navigator.clipboard.writeText("Imaginate " + scoreText);
-    shareButton.current?.setAttribute('loading', '1000')
-    setInterval(() => {
-      shareButton.current?.setAttribute('disabled', 'true')
-      if (shareButton.current?.textContent) {
-        shareButton.current.textContent = "Copied to clipboard!"
-      }
-    }, 1000)
-
-  }
-
   return (
     <div className='w-10/12 h-full'>
       <div
-        ref={imageContainer}
-        className='flex justify-center'
+        className='flex justify-center relative rounded-lg overflow-hidden mb-8'
         style={{ backgroundColor: undefined }}
       >
-        <img
-          ref={image}
-          className='w-auto mb-2 mix-blend-overlay rounded-lg h-full'
-          src={images[index].url}
-        ></img>
+        <img ref={image} className='w-auto h-full' src={images[index].url} />
+        <div className='opacity-75 absolute w-full h-full'>
+          {feedbackOverlay}
+        </div>
       </div>
       <PhotoQueueButtons
         makeChoice={makeChoice}
         disabled={disableButtons}
       ></PhotoQueueButtons>
+      <h1 className='text-body text-center mt-4'>
+        {index + ' / ' + images.length}
+      </h1>
       <Modal
         title='Well Played!'
         open={isModalOpen}
@@ -224,10 +204,7 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
   );
 };
 
-
 function App() {
-  const { darkAlgorithm } = theme;
-
   const { darkAlgorithm } = theme;
 
   return (
