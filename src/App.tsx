@@ -6,7 +6,7 @@ import {
 } from './interfaces/PhotoQueueProps.ts';
 import { testImages } from './testData.ts';
 import Navbar from './navigation/Navbar';
-import { ConfigProvider, theme, Modal, Button } from 'antd';
+import { ConfigProvider, theme, Modal, Button, Carousel } from 'antd';
 import { CloseOutlined, CheckOutlined } from '@ant-design/icons';
 const PhotoQueueButtons = ({
   makeChoice,
@@ -92,7 +92,7 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
   const [score, setScore] = useState(0);
   const [index, setIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [scoreText, setScoreText] = useState('');
+  const [choiceKeeper, setChoiceKeeper] = useState<Array<boolean>>([]);
   const [disableButtons, setDisableButtons] = useState(false);
   const shareButton = useRef<HTMLButtonElement>(null);
   const image = useRef<HTMLImageElement>(null);
@@ -109,6 +109,7 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
           <CheckOutlined className='text-9xl text-green-800' />
         </div>,
       );
+      setChoiceKeeper([...choiceKeeper, true])
     } else {
       setScoreText(scoreText + '🟥');
       setFeedbackOverlay(
@@ -116,6 +117,7 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
           <CloseOutlined className='text-9xl text-red-800' />
         </div>,
       );
+      setChoiceKeeper([...choiceKeeper, false]);
     }
 
     setTimeout(() => {
@@ -132,23 +134,35 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
     return isCorrectChoice;
   };
 
-  let answers = images.map((image) => {
-    let generatedText;
-    if (image.generated) {
-      generatedText = 'AI';
-    } else {
-      generatedText = 'Real';
-    }
+  const scoreText = 'Imaginate ' + score + ' / ' + images.length + '\n';
+  const emojiScoreText = choiceKeeper
+    .map((correctChoice) => (correctChoice ? '🟩' : '🟥'))
+    .join('');
+
+  const answers = images.map((image, index) => {
+    const generatedText = image.generated ? 'AI' : 'Real';
+    const userChoseCorrectly = choiceKeeper[index];
     return (
-      <div>
-        <img className='rounded-lg' key={image.url} src={image.url} />
-        <p>{generatedText}</p>
+      <div className='m-4 '>
+        <div className='flex justify-center'>
+          <img
+            className={
+              'rounded-lg m-4 border-solid border-2 ' +
+              (userChoseCorrectly ? 'border-green-600' : 'border-red-600')
+            }
+            style={{ maxWidth: '500px' }}
+            width='100%'
+            key={image.url}
+            src={image.url}
+          />
+        </div>
+        <p className='text-3xl'>This Photo is {generatedText}</p>
       </div>
     );
   });
 
   const shareButtonCopy = () => {
-    navigator.clipboard.writeText('Imaginate ' + scoreText);
+    navigator.clipboard.writeText(scoreText + '\n' + emojiScoreText);
     shareButton.current?.setAttribute('loading', '1000');
     setInterval(() => {
       shareButton.current?.setAttribute('disabled', 'true');
@@ -179,7 +193,8 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
       <Modal
         title='Well Played!'
         open={isModalOpen}
-        width={'80vw'}
+        width={'700px'}
+        style={{ maxWidth: '95vw' }}
         footer={[
           <Button
             ref={shareButton}
@@ -191,13 +206,18 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
         ]}
         onCancel={() => setIsModalOpen(false)}
       >
-        {' '}
         <div className='text-center grid gap-6 grid-cols-1'>
           <p>
             You got {score} out of {images.length} correct!
           </p>
-          <div className='flex gap-4'>{answers}</div>
-          <p>{scoreText}</p>
+          <Carousel
+            arrows
+            dotPosition='left'
+            infinite={false}
+            className='flex gap-4'
+          >
+            {answers}
+          </Carousel>
         </div>
       </Modal>
     </div>
