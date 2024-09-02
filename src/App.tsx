@@ -147,7 +147,7 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
     );
 
     return (
-      <div className='m-4 '>
+      <div className='p-8'>
         <div className='flex justify-center '>
           <div className='relative p-4'>
             <img
