@@ -103,15 +103,13 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
 
     if (isCorrectChoice) {
       setScore(score + 1);
-      setScoreText(scoreText + '🟩');
       setFeedbackOverlay(
         <div className='absolute w-full h-full content-center text-center bg-green-500'>
           <CheckOutlined className='text-9xl text-green-800' />
         </div>,
       );
-      setChoiceKeeper([...choiceKeeper, true])
+      setChoiceKeeper([...choiceKeeper, true]);
     } else {
-      setScoreText(scoreText + '🟥');
       setFeedbackOverlay(
         <div className=' absolute w-full h-full content-center text-center bg-red-500'>
           <CloseOutlined className='text-9xl text-red-800' />
@@ -142,34 +140,40 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
   const answers = images.map((image, index) => {
     const generatedText = image.generated ? 'AI' : 'Real';
     const userChoseCorrectly = choiceKeeper[index];
+    const feedbackIcon = userChoseCorrectly ? (
+      <CheckOutlined className='text-6xl text-green-600 absolute bottom-6 right-6 z-10' />
+    ) : (
+      <CloseOutlined className='text-6xl text-red-600 absolute bottom-6 right-6 z-10' />
+    );
+
     return (
       <div className='m-4 '>
-        <div className='flex justify-center'>
-          <img
-            className={
-              'rounded-lg m-4 border-solid border-2 ' +
-              (userChoseCorrectly ? 'border-green-600' : 'border-red-600')
-            }
-            style={{ maxWidth: '500px' }}
-            width='100%'
-            key={image.url}
-            src={image.url}
-          />
+        <div className='flex justify-center '>
+          <div className='relative p-4'>
+            <img
+              className={
+                'rounded-lg border-solid border-2 z-0 ' +
+                (userChoseCorrectly ? 'border-green-600' : 'border-red-600')
+              }
+              style={{ maxWidth: '500px' }}
+              width='100%'
+              key={image.url}
+              src={image.url}
+            />
+            {feedbackIcon}
+          </div>
         </div>
-        <p className='text-3xl'>This Photo is {generatedText}</p>
+        <p className='text-2xl'>This Photo is {generatedText}</p>
       </div>
     );
   });
 
   const shareButtonCopy = () => {
     navigator.clipboard.writeText(scoreText + '\n' + emojiScoreText);
-    shareButton.current?.setAttribute('loading', '1000');
-    setInterval(() => {
-      shareButton.current?.setAttribute('disabled', 'true');
-      if (shareButton.current?.textContent) {
-        shareButton.current.textContent = 'Copied to clipboard!';
-      }
-    }, 1000);
+    shareButton.current?.setAttribute('disabled', 'true');
+    if (shareButton.current?.textContent) {
+      shareButton.current.textContent = 'Score coppied to clipboard!';
+    }
   };
 
   return (
@@ -207,7 +211,7 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
         onCancel={() => setIsModalOpen(false)}
       >
         <div className='text-center grid gap-6 grid-cols-1'>
-          <p>
+          <p className='text-2xl'>
             You got {score} out of {images.length} correct!
           </p>
           <Carousel
