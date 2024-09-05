@@ -3,8 +3,8 @@ import './App.css';
 import {
   PhotoQueueProps,
   PhotoQueueButtonProps,
-} from './interfaces/PhotoQueueProps';
-import { testImages } from './testData';
+} from './interfaces/PhotoQueueProps.ts';
+import { testImages } from './testData.ts';
 import Navbar from './navigation/Navbar';
 import { ConfigProvider, theme, Modal, Button } from 'antd';
 import { CloseOutlined, CheckOutlined } from '@ant-design/icons';
@@ -12,8 +12,8 @@ const PhotoQueueButtons = ({
   makeChoice,
   disabled,
 }: PhotoQueueButtonProps): JSX.Element => {
-  const AiButton = useRef<HTMLElement>(null);
-  const RealButton = useRef<HTMLElement>(null);
+  const AiButton = useRef<HTMLButtonElement>(null);
+  const RealButton = useRef<HTMLButtonElement>(null);
   const [oldButtonBackgroundColor, setOldButtonBackgroundColor] = useState('');
 
   const clickHandler = (target: HTMLElement) => {
@@ -94,8 +94,8 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [scoreText, setScoreText] = useState('');
   const [disableButtons, setDisableButtons] = useState(false);
-  const shareButton = useRef<HTMLElement>(null);
-  const image = useRef<HTMLElement>(null);
+  const shareButton = useRef<HTMLButtonElement>(null);
+  const image = useRef<HTMLImageElement>(null);
   const [feedbackOverlay, setFeedbackOverlay] = useState<ReactElement>();
 
   const makeChoice = (choseGenerated: boolean, choiceCallBack: Function) => {

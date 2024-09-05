@@ -1,7 +1,7 @@
-import { Image } from "./ImageInterface";
+import { Image } from './ImageInterface.ts';
 
 export interface PhotoQueueProps {
-  images: Image[],
+  images: Image[];
 }
 
 export interface PhotoQueueButtonProps {
