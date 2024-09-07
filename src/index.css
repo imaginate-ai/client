@@ -60,6 +60,9 @@ p {
   font-size: 40px !important;
 }
 
+.ant-tour {
+  max-width: 100vw !important;
+}
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

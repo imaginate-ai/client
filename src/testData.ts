@@ -5,25 +5,30 @@ import cat3 from './assets/cat3.jpg';
 import cat4 from './assets/cat4.jpg';
 import cat5 from './assets/cat5.png';
 
-export const testImages: Image[] = [
+export const testImages: Partial<Image>[] = [
   {
     url: cat1,
-    generated: true,
+    real: false,
+    theme: 'cat',
   },
   {
     url: cat2,
-    generated: true,
+    real: false,
+    theme: 'cat',
   },
   {
     url: cat3,
-    generated: false,
+    real: true,
+    theme: 'cat',
   },
   {
     url: cat4,
-    generated: true,
+    real: false,
+    theme: 'cat',
   },
   {
     url: cat5,
-    generated: true,
+    real: false,
+    theme: 'cat',
   },
 ];

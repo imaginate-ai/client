@@ -1,4 +1,4 @@
-import { useState, JSX, useRef, ReactElement } from 'react';
+import { useState, JSX, useRef, ReactElement, useEffect } from 'react';
 import './App.css';
 import {
   PhotoQueueProps,
@@ -6,8 +6,29 @@ import {
 } from './interfaces/PhotoQueueProps.ts';
 import { testImages } from './testData.ts';
 import Navbar from './navigation/Navbar';
-import { ConfigProvider, theme, Modal, Button, Carousel } from 'antd';
-import { CloseOutlined, CheckOutlined } from '@ant-design/icons';
+import {
+  ConfigProvider,
+  theme,
+  Modal,
+  Button,
+  Carousel,
+  Progress,
+  Flex,
+  Tour,
+  TourProps,
+  FloatButton,
+} from 'antd';
+import {
+  CloseOutlined,
+  CheckOutlined,
+  ShareAltOutlined,
+  LoadingOutlined,
+  QuestionCircleOutlined,
+} from '@ant-design/icons';
+import posthog from 'posthog-js';
+
+const imageTheme = testImages[0].theme;
+
 const PhotoQueueButtons = ({
   makeChoice,
   disabled,
@@ -17,19 +38,18 @@ const PhotoQueueButtons = ({
   const [oldButtonBackgroundColor, setOldButtonBackgroundColor] = useState('');
 
   const clickHandler = (target: HTMLElement) => {
-    let choseGenerated = false;
+    let choseReal: boolean;
     setOldButtonBackgroundColor(target.style.backgroundColor);
 
     if (AiButton?.current && RealButton?.current) {
       buttonsDisabled(true);
       if (target.textContent === 'A.I.') {
-        choseGenerated = true;
+        choseReal = false;
+      } else {
+        choseReal = true;
       }
-      const isCorrectChoice = makeChoice(choseGenerated, choiceCallBack);
-      if (
-        (choseGenerated && !isCorrectChoice) ||
-        (!choseGenerated && isCorrectChoice)
-      ) {
+      const isCorrectChoice = makeChoice(choseReal, choiceCallBack);
+      if (choseReal === isCorrectChoice) {
         AiButton.current.style.backgroundColor = 'red';
         RealButton.current.style.backgroundColor = 'green';
       } else {
@@ -65,30 +85,28 @@ const PhotoQueueButtons = ({
   }
 
   return (
-    <>
-      <div className='flex flex-row gap-8 h-16'>
-        <Button
-          ref={AiButton}
-          type='primary'
-          className={'choiceButton mb-2 w-full h-full text-body'}
-          onClick={(event) => clickHandler(event.target as HTMLElement)}
-        >
-          A.I.
-        </Button>
-        <Button
-          ref={RealButton}
-          type='primary'
-          className={'choiceButton mb-2 w-full h-full text-body'}
-          onClick={(event) => clickHandler(event.target as HTMLElement)}
-        >
-          Real
-        </Button>
-      </div>
-    </>
+    <div className='flex flex-row gap-8 h-16'>
+      <Button
+        ref={AiButton}
+        type='primary'
+        className={'choiceButton mb-2 w-full h-full text-body'}
+        onClick={(event) => clickHandler(event.target as HTMLElement)}
+      >
+        A.I.
+      </Button>
+      <Button
+        ref={RealButton}
+        type='primary'
+        className={'choiceButton mb-2 w-full h-full text-body'}
+        onClick={(event) => clickHandler(event.target as HTMLElement)}
+      >
+        Real
+      </Button>
+    </div>
   );
 };
 
-const apiUrl = 'http://127.0.0.1:5000'
+const apiUrl = 'http://127.0.0.1:5000';
 
 const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
   const [score, setScore] = useState(0);
@@ -98,10 +116,39 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
   const [disableButtons, setDisableButtons] = useState(false);
   const shareButton = useRef<HTMLButtonElement>(null);
   const image = useRef<HTMLImageElement>(null);
+  const parentBox = useRef<HTMLDivElement>(null);
   const [feedbackOverlay, setFeedbackOverlay] = useState<ReactElement>();
 
-  const makeChoice = (choseGenerated: boolean, choiceCallBack: Function) => {
-    const isCorrectChoice = choseGenerated == images[index].generated;
+  const [openTour, setOpenTour] = useState(false);
+
+  const imageTourStep = useRef<HTMLDivElement>(null);
+  const buttonsTourStep = useRef<HTMLDivElement>(null);
+
+  const steps: TourProps['steps'] = [
+    {
+      title: 'Welcome!',
+      description:
+        'This is Imaginate. You will be given a list of photos, and you have to decipher which are real photos, and which are AI generated.',
+      target: null,
+    },
+    {
+      title: 'The Photo Queue',
+      description:
+        'Here is where the photos will apear, one after another. Be sure to analyze them thoroughly!',
+      placement: 'top',
+      target: () => imageTourStep.current as HTMLElement,
+    },
+    {
+      title: 'The Choice Buttons',
+      description:
+        'These buttons are used to select whether you think the current image is real or AI generated. The choice is yours. Good luck!',
+      placement: 'bottom',
+      target: () => buttonsTourStep.current as HTMLElement,
+    },
+  ];
+
+  const makeChoice = (choseReal: boolean, choiceCallBack: Function) => {
+    const isCorrectChoice = choseReal == images[index].real;
 
     if (isCorrectChoice) {
       setScore(score + 1);
@@ -140,7 +187,7 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
     .join('');
 
   const answers = images.map((image, index) => {
-    const generatedText = image.generated ? 'AI' : 'Real';
+    const generatedText = image.real ? 'Real' : 'AI';
     const userChoseCorrectly = choiceKeeper[index];
     const feedbackIcon = userChoseCorrectly ? (
       <CheckOutlined className='text-6xl text-green-600 absolute bottom-6 right-6 z-10' />
@@ -155,7 +202,7 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
             <img
               className={
                 'rounded-lg border-solid border-2 z-0 ' +
-                (userChoseCorrectly ? 'border-green-600' : 'border-red-600')
+                (userChoseCorrectly ? 'border-green-500' : 'border-red-500')
               }
               style={{ maxWidth: '500px' }}
               width='100%'
@@ -171,78 +218,126 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
   });
 
   const shareButtonCopy = () => {
-    navigator.clipboard.writeText(scoreText + '\n' + emojiScoreText);
-    shareButton.current?.setAttribute('disabled', 'true');
-    if (shareButton.current?.textContent) {
-      shareButton.current.textContent = 'Score coppied to clipboard!';
+    const copyToClipBoardDelayMs = 2000;
+    if (shareButton.current) {
+      navigator.clipboard.writeText(scoreText + '\n' + emojiScoreText);
+      setTimeout(() => {
+        if (shareButton.current) {
+          shareButton.current.textContent = 'Score copied to clipboard!';
+        }
+      }, copyToClipBoardDelayMs);
     }
   };
   let apiTest;
   const getPhotos = async () => {
-    const dateBody = await fetch(apiUrl + "/date/latest").then((res) => res.json());
-    const date = dateBody.date;
-    const imageBody: any[] = await fetch(apiUrl + `/date/${date}/images`).then((res) => res.json());
-    const apiImages: any[] = imageBody.map(
-      async (image) => await fetch(apiUrl + image.url)
-        .then((response) => response.json())
+    const dateBody = await fetch(apiUrl + '/date/latest').then((res) =>
+      res.json(),
     );
-    apiTest = await apiImages.map(((body) => <img src={'data:image/png;base64, ' + body.url} />));
-  }
+    const date = dateBody.date;
+    const imageBody: any[] = await fetch(apiUrl + `/date/${date}/images`).then(
+      (res) => res.json(),
+    );
+    const apiImages: any[] = imageBody.map(
+      async (image) =>
+        await fetch(apiUrl + image.url).then((response) => response.json()),
+    );
+    apiTest = await apiImages.map((body) => (
+      <img src={'data:image/png;base64, ' + body.url} />
+    ));
+  };
 
-  return (
-    <div className='w-10/12 h-full'>
-      <div
-        className='flex justify-center relative rounded-lg overflow-hidden mb-8'
-        style={{ backgroundColor: undefined }}
-      >
-        <img ref={image} className='w-auto h-full' src={images[index].url} />
-        <div className='opacity-75 absolute w-full h-full'>
-          {feedbackOverlay}
-        </div>
+  if (images) {
+    return (
+      <div>
+        <FloatButton
+          tooltip='How to play'
+          icon={<QuestionCircleOutlined />}
+          onClick={() => setOpenTour(true)}
+        />
+
+        <Flex align='center' justify='center'>
+          <div ref={parentBox} className='w-10/12'>
+            <Progress
+              size={[parentBox.current?.offsetWidth ?? 0, 10]}
+              percent={disableButtons ? 100 : (index / images.length) * 100}
+              showInfo={false}
+            />
+            <div
+              ref={imageTourStep}
+              className='flex justify-center relative rounded-lg overflow-hidden mb-8'
+              style={{ backgroundColor: undefined }}
+            >
+              <img
+                ref={image}
+                className='w-auto h-full'
+                src={images[index].url}
+              />
+              <div className='opacity-75 absolute w-full h-full'>
+                {feedbackOverlay}
+              </div>
+            </div>
+            <div ref={buttonsTourStep}>
+              <PhotoQueueButtons
+                makeChoice={makeChoice}
+                disabled={disableButtons}
+              />
+            </div>
+            <Modal
+              title='Well Played!'
+              open={isModalOpen}
+              width={'700px'}
+              style={{ maxWidth: '95vw' }}
+              footer={[
+                <Button
+                  ref={shareButton}
+                  type='default'
+                  onClick={() => shareButtonCopy()}
+                >
+                  <ShareAltOutlined />
+                  Share
+                </Button>,
+              ]}
+              onCancel={() => setIsModalOpen(false)}
+            >
+              <div className='text-center grid gap-6 grid-cols-1'>
+                <p className='text-2xl'>
+                  You got {score} out of {images.length} correct!
+                </p>
+                <Carousel
+                  arrows
+                  dotPosition='left'
+                  infinite={false}
+                  className='flex gap-4'
+                >
+                  {answers}
+                </Carousel>
+              </div>
+            </Modal>
+          </div>
+          <Tour
+            open={openTour}
+            onClose={() => setOpenTour(false)}
+            steps={steps}
+          />
+        </Flex>
       </div>
-      <PhotoQueueButtons
-        makeChoice={makeChoice}
-        disabled={disableButtons}
-      ></PhotoQueueButtons>
-      <h1 className='text-body text-center mt-4'>
-        {index + ' / ' + images.length}
-      </h1>
-      <Modal
-        title='Well Played!'
-        open={isModalOpen}
-        width={'700px'}
-        style={{ maxWidth: '95vw' }}
-        footer={[
-          <Button
-            ref={shareButton}
-            type='default'
-            onClick={() => shareButtonCopy()}
-          >
-            Share
-          </Button>,
-        ]}
-        onCancel={() => setIsModalOpen(false)}
-      >
-        <div className='text-center grid gap-6 grid-cols-1'>
-          <p className='text-2xl'>
-            You got {score} out of {images.length} correct!
-          </p>
-          <Carousel
-            arrows
-            dotPosition='left'
-            infinite={false}
-            className='flex gap-4'
-          >
-            {answers}
-          </Carousel>
-        </div>
-      </Modal>
-    </div>
-  );
+    );
+  } else {
+    return (
+      <Flex justify='center' className='w-screen'>
+        <LoadingOutlined className='text-5xl' />
+      </Flex>
+    );
+  }
 };
 
 function App() {
   const { darkAlgorithm } = theme;
+
+  posthog.init('phc_TrQqpxDjEZAOLzSUBk8DKJF8UzhBj4sbkhe6YOSxYxe', {
+    api_host: 'https://us.i.posthog.com',
+    person_profiles: 'identified_only', // or 'always' to create profiles for anonymous users as well
+  });
 
   return (
     <div className='h-full'>
@@ -251,10 +346,31 @@ function App() {
           algorithm: darkAlgorithm,
         }}
       >
-        <Navbar />
-        <div className='flex justify-center'>
-          <PhotoQueue images={testImages} />
-        </div>
+        <Flex align='flex-start' className='h-full' vertical>
+          <Navbar theme={imageTheme} />
+          <Flex
+            align='center'
+            justify='space-evenly'
+            className='flex-auto'
+            vertical
+          >
+            <PhotoQueue images={testImages} />
+            <p>
+              Made by{' '}
+              <a href='https://faisal-fawad.github.io' target='_blank'>
+                Faisal
+              </a>
+              ,{' '}
+              <a href='https://nathanprobert.ca' target='_blank'>
+                Nate
+              </a>
+              , and{' '}
+              <a href='https://linkedin.com/in/zach-legesse ' target='_blank'>
+                Zach
+              </a>
+            </p>
+          </Flex>
+        </Flex>
       </ConfigProvider>
     </div>
   );

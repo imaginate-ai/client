@@ -1,4 +1,9 @@
 export interface Image {
-  url: string,
-  generated: boolean,
+  data: string;
+  date: string;
+  filename: string;
+  real: boolean;
+  status: 'verified';
+  theme: string;
+  url: string;
 }
