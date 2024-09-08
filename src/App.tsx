@@ -1,4 +1,4 @@
-import { useState, JSX, useRef, ReactElement } from 'react';
+import { useState, JSX, useRef, ReactElement, useEffect } from 'react';
 import './App.css';
 import {
   PhotoQueueProps,
@@ -21,13 +21,21 @@ import {
 import {
   CloseOutlined,
   CheckOutlined,
-  ShareAltOutlined,
+  CopyOutlined,
   LoadingOutlined,
   QuestionCircleOutlined,
 } from '@ant-design/icons';
 import posthog from 'posthog-js';
+import Cookies from 'universal-cookie';
 
 const imageTheme = testImages[0].theme;
+const septemberFirstTimeStamp = 1725148800000;
+const septemberFirst = new Date(septemberFirstTimeStamp).setHours(0, 0, 0, 0);
+const msPerDay = 86400000;
+const today = new Date().setHours(0, 0, 0, 0);
+const imaginateDay = (today - septemberFirst) / msPerDay;
+
+const cookies = new Cookies();
 
 const PhotoQueueButtons = ({
   makeChoice,
@@ -35,11 +43,9 @@ const PhotoQueueButtons = ({
 }: PhotoQueueButtonProps): JSX.Element => {
   const AiButton = useRef<HTMLButtonElement>(null);
   const RealButton = useRef<HTMLButtonElement>(null);
-  const [oldButtonBackgroundColor, setOldButtonBackgroundColor] = useState('');
 
   const clickHandler = (target: HTMLElement) => {
     let choseReal: boolean;
-    setOldButtonBackgroundColor(target.style.backgroundColor);
 
     if (AiButton?.current && RealButton?.current) {
       buttonsDisabled(true);
@@ -48,27 +54,17 @@ const PhotoQueueButtons = ({
       } else {
         choseReal = true;
       }
-      const isCorrectChoice = makeChoice(choseReal, choiceCallBack);
-      if (choseReal === isCorrectChoice) {
-        AiButton.current.style.backgroundColor = 'red';
-        RealButton.current.style.backgroundColor = 'green';
-      } else {
-        AiButton.current.style.backgroundColor = 'green';
-        RealButton.current.style.backgroundColor = 'red';
-      }
+      makeChoice(choseReal, choiceCallBack);
     }
   };
 
   const choiceCallBack = () => {
     if (AiButton?.current && RealButton?.current) {
       buttonsDisabled(false);
-      AiButton.current.style.backgroundColor = oldButtonBackgroundColor;
-      RealButton.current.style.backgroundColor = oldButtonBackgroundColor;
     }
   };
 
   const buttonsDisabled = (value: boolean) => {
-    console.log(value);
     if (AiButton?.current && RealButton?.current) {
       if (value) {
         AiButton.current.setAttribute('disabled', 'true');
@@ -128,24 +124,39 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
     {
       title: 'Welcome!',
       description:
-        'This is Imaginate. You will be given a list of photos, and you have to decipher which are real photos, and which are AI generated.',
+        'This is Imaginate. You will be given a different list of photos every day, and you have to decipher which are real photos, and which are AI generated.',
       target: null,
     },
     {
       title: 'The Photo Queue',
       description:
-        'Here is where the photos will apear, one after another. Be sure to analyze them thoroughly!',
+        'Here is where the photos will appear, one after another. Be sure to analyze them thoroughly!',
       placement: 'top',
       target: () => imageTourStep.current as HTMLElement,
     },
     {
       title: 'The Choice Buttons',
       description:
-        'These buttons are used to select whether you think the current image is real or AI generated. The choice is yours. Good luck!',
+        'These buttons are used to select whether you think the current photo is real or AI generated. The choice is yours. Good luck!',
       placement: 'bottom',
       target: () => buttonsTourStep.current as HTMLElement,
     },
   ];
+
+  const generateCompleteScoreText = () => {
+    const scoreText = 'Imaginate ' + imaginateDay;
+    const emojiScoreText = choiceKeeper
+      .map((correctChoice) => (correctChoice ? '🟩' : '🟥'))
+      .join('');
+    return scoreText + '\n' + emojiScoreText;
+  };
+
+  useEffect(() => {
+    if (choiceKeeper.length) {
+      const completeScoreText = generateCompleteScoreText();
+      cookies.set('last_complete_score_text', completeScoreText);
+    }
+  }, [choiceKeeper]);
 
   const makeChoice = (choseReal: boolean, choiceCallBack: Function) => {
     const isCorrectChoice = choseReal == images[index].real;
@@ -173,6 +184,8 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
       } else {
         setIsModalOpen(true);
         setDisableButtons(true);
+        const today = new Date();
+        cookies.set('day_last_played', today.setHours(0, 0, 0, 0));
       }
       setFeedbackOverlay(undefined);
       choiceCallBack();
@@ -180,11 +193,6 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
 
     return isCorrectChoice;
   };
-
-  const scoreText = 'Imaginate ' + score + ' / ' + images.length + '\n';
-  const emojiScoreText = choiceKeeper
-    .map((correctChoice) => (correctChoice ? '🟩' : '🟥'))
-    .join('');
 
   const answers = images.map((image, index) => {
     const generatedText = image.real ? 'Real' : 'AI';
@@ -196,7 +204,7 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
     );
 
     return (
-      <div className='p-8'>
+      <div className='p-8' key={image.filename}>
         <div className='flex justify-center '>
           <div className='relative p-4'>
             <img
@@ -218,14 +226,14 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
   });
 
   const shareButtonCopy = () => {
-    const copyToClipBoardDelayMs = 2000;
+    const completeScoreText = cookies.get('last_complete_score_text');
     if (shareButton.current) {
-      navigator.clipboard.writeText(scoreText + '\n' + emojiScoreText);
-      setTimeout(() => {
-        if (shareButton.current) {
-          shareButton.current.textContent = 'Score copied to clipboard!';
-        }
-      }, copyToClipBoardDelayMs);
+      if (completeScoreText) {
+        navigator.clipboard.writeText(completeScoreText);
+        shareButton.current.innerHTML = 'Score copied!';
+      } else {
+        shareButton.current.textContent = 'Something went wrong :(';
+      }
     }
   };
   // let apiTest;
@@ -293,8 +301,8 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
                   type='default'
                   onClick={() => shareButtonCopy()}
                 >
-                  <ShareAltOutlined />
-                  Share
+                  <CopyOutlined />
+                  Copy score
                 </Button>,
               ]}
               onCancel={() => setIsModalOpen(false)}
@@ -333,11 +341,43 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
 
 function App() {
   const { darkAlgorithm } = theme;
+  const [showApp, setShowApp] = useState(true);
+  const savedScoreString = useRef<ReactElement>();
 
   posthog.init('phc_TrQqpxDjEZAOLzSUBk8DKJF8UzhBj4sbkhe6YOSxYxe', {
     api_host: 'https://us.i.posthog.com',
     person_profiles: 'identified_only', // or 'always' to create profiles for anonymous users as well
   });
+
+  const splitNewlinesToParagraphTags = (input: string) => {
+    return input.split('\n').map((text) => <p>{text}</p>);
+  };
+
+  useEffect(() => {
+    const dayLastPlayed = new Date(cookies.get('day_last_played'));
+    const completeScoreText: string = cookies.get('last_complete_score_text');
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (
+      dayLastPlayed.toTimeString() === today.toTimeString() &&
+      completeScoreText
+    ) {
+      setShowApp(false);
+      savedScoreString.current = (
+        <div>{splitNewlinesToParagraphTags(completeScoreText)}</div>
+      );
+    }
+  }, []);
+
+  const dailyGameReminder = (
+    <div style={{ width: '100vw', maxWidth: '1024px' }} className='text-center'>
+      <p className='font-semibold mb-2'>
+        You already played today! See you again tomorrow :)
+      </p>
+      {savedScoreString.current}
+    </div>
+  );
+  const body = showApp ? <PhotoQueue images={testImages} /> : dailyGameReminder;
 
   return (
     <div className='h-full'>
@@ -346,7 +386,7 @@ function App() {
           algorithm: darkAlgorithm,
         }}
       >
-        <Flex align='flex-start' className='h-full' vertical>
+        <Flex align='flex-start' className='h-full w-full' vertical>
           <Navbar theme={imageTheme} />
           <Flex
             align='center'
@@ -354,7 +394,7 @@ function App() {
             className='flex-auto'
             vertical
           >
-            <PhotoQueue images={testImages} />
+            {body}
             <p>
               Made by{' '}
               <a href='https://faisal-fawad.github.io' target='_blank'>
