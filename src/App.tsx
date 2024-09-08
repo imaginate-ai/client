@@ -1,4 +1,4 @@
-import { useState, JSX, useRef, ReactElement, useEffect } from 'react';
+import { useState, JSX, useRef, ReactElement } from 'react';
 import './App.css';
 import {
   PhotoQueueProps,
@@ -106,7 +106,7 @@ const PhotoQueueButtons = ({
   );
 };
 
-const apiUrl = 'http://127.0.0.1:5000';
+// const apiUrl = 'http://127.0.0.1:5000';
 
 const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
   const [score, setScore] = useState(0);
@@ -228,23 +228,23 @@ const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
       }, copyToClipBoardDelayMs);
     }
   };
-  let apiTest;
-  const getPhotos = async () => {
-    const dateBody = await fetch(apiUrl + '/date/latest').then((res) =>
-      res.json(),
-    );
-    const date = dateBody.date;
-    const imageBody: any[] = await fetch(apiUrl + `/date/${date}/images`).then(
-      (res) => res.json(),
-    );
-    const apiImages: any[] = imageBody.map(
-      async (image) =>
-        await fetch(apiUrl + image.url).then((response) => response.json()),
-    );
-    apiTest = await apiImages.map((body) => (
-      <img src={'data:image/png;base64, ' + body.url} />
-    ));
-  };
+  // let apiTest;
+  // const getPhotos = async () => {
+  //   const dateBody = await fetch(apiUrl + '/date/latest').then((res) =>
+  //     res.json(),
+  //   );
+  //   const date = dateBody.date;
+  //   const imageBody: any[] = await fetch(apiUrl + `/date/${date}/images`).then(
+  //     (res) => res.json(),
+  //   );
+  //   const apiImages: any[] = imageBody.map(
+  //     async (image) =>
+  //       await fetch(apiUrl + image.url).then((response) => response.json()),
+  //   );
+  //   apiTest = await apiImages.map((body) => (
+  //     <img src={'data:image/png;base64, ' + body.url} />
+  //   ));
+  // };
 
   if (images) {
     return (

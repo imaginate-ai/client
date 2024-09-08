@@ -1,4 +1,4 @@
-import { Button, Divider, Flex, Tooltip } from 'antd';
+import { Divider, Flex, Tooltip } from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import logo from '../assets/imaginate-logo.png';
 import './Navbar.css';
