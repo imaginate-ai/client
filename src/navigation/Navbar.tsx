@@ -13,11 +13,15 @@ const Navbar = ({ theme }: NavBarProps) => {
         <img className='h-10 mx-4 mt-6' src={logo} />
         <div className='mx-4 mt-4'>
           <Tooltip title={THEME_EXPLAINER_TEXT} placement='bottomLeft'>
-            <Flex>
-              <InfoCircleOutlined className='mr-1' />
-              <p className='mr-2'>Theme:</p>
-              <p>{theme}</p>
-            </Flex>
+            {theme ? (
+              <Flex>
+                <InfoCircleOutlined className='mr-1' />
+                <p className='mr-2'>Theme:</p>
+                <p>{theme}</p>
+              </Flex>
+            ) : (
+              ''
+            )}
           </Tooltip>
         </div>
       </Flex>
