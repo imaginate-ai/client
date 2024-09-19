@@ -95,7 +95,7 @@ function App() {
                 Nate
               </a>
               , and{' '}
-              <a href='https://linkedin.com/in/zach-legesse ' target='_blank'>
+              <a href='https://zachlegesse.ca' target='_blank'>
                 Zach
               </a>
             </p>
