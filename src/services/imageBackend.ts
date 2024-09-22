@@ -1,4 +1,4 @@
-const API_URL = 'https://kjssqls0ue.execute-api.us-east-1.amazonaws.com/call';
+const API_URL = 'https://o7hgv46qcf7swox3ygn53tayay0zzhgl.lambda-url.us-east-1.on.aws/';
 const START_DATE = 1725148800000; //september 1st 2024 in timestamp form in miliseconds
 const MS_PER_DAY = 86400000;
 
