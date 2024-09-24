@@ -15,14 +15,14 @@ function App() {
   const { darkAlgorithm } = theme;
   const [showApp, setShowApp] = useState(true);
   const savedScoreString = useRef<ReactElement>();
-  const [images, setImages] = useState<Image[]>([])
-  const [imageTheme, setImageTheme] = useState('')
+  const [images, setImages] = useState<Image[]>([]);
+  const [imageTheme, setImageTheme] = useState('');
 
   useEffect(() => {
     getImages().then((response: Image[]) => {
       if (response) {
         setImages(response);
-        setImageTheme(response[0].theme)
+        setImageTheme(response[0].theme);
       }
     });
   }, []);
@@ -33,7 +33,7 @@ function App() {
   });
 
   const splitNewlinesToParagraphTags = (input: string) => {
-    return input.split('\n').map((text) => <p>{text}</p>);
+    return input.split('\n').map((text) => <p key={text}>{text}</p>);
   };
 
   useEffect(() => {
@@ -54,9 +54,8 @@ function App() {
 
   const dailyGameReminder = (
     <div className='text-center'>
-      <p className='font-semibold mb-2'>
-        You already played today! See you again tomorrow :)
-      </p>
+      <p className='font-semibold mb-2'>You already played today!</p>
+      <p className='font-semibold mb-2'>See you again tomorrow :)</p>
       {savedScoreString.current}
     </div>
   );

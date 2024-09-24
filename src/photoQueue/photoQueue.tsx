@@ -118,7 +118,7 @@ export const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
   };
 
   const answers = images.map((image, index) => {
-    const generatedText = image.real ? 'Real' : 'AI';
+    const generatedText = image.real ? 'real' : 'AI';
     const userChoseCorrectly = choiceKeeper[index];
     const feedbackIcon = userChoseCorrectly ? (
       <CheckOutlined className='text-6xl text-green-600 absolute bottom-6 right-6 z-10' />
@@ -135,14 +135,14 @@ export const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
                 'rounded-lg border-solid border-2 z-0 ' +
                 (userChoseCorrectly ? 'border-green-500' : 'border-red-500')
               }
-              style={{ maxWidth: '500px' }}
+              style={{ maxWidth: '100%' }}
               key={image.url}
               src={`data:image/png;base64,${image.data}`}
             />
             {feedbackIcon}
           </div>
         </div>
-        <p className='text-2xl'>This Photo is {generatedText}</p>
+        <p className='text-2xl'>This photo is {generatedText}</p>
       </div>
     );
   });
@@ -202,12 +202,13 @@ export const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
             <Modal
               title='Well Played!'
               open={isModalOpen}
-              width={'700px'}
+              width={'600px'}
               style={{ maxWidth: '95vw' }}
               footer={[
                 <Button
                   ref={shareButton}
                   type='default'
+                  key='shareButton'
                   onClick={() => shareButtonCopy()}
                 >
                   <CopyOutlined />
