@@ -67,10 +67,14 @@ export const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
   ];
 
   const generateCompleteScoreText = () => {
-    const scoreText = 'Imaginate ' + imaginateDay;
-    const emojiScoreText = choiceKeeper
+    const scoreText = 'Imaginate #' + imaginateDay;
+    let emojiScoreText;
+    emojiScoreText = choiceKeeper
       .map((correctChoice) => (correctChoice ? '🟩' : '🟥'))
       .join('');
+    if (choiceKeeper.every((val) => val === choiceKeeper[0])) {
+      emojiScoreText += '✨';
+    }
     return scoreText + '\n' + emojiScoreText;
   };
 
