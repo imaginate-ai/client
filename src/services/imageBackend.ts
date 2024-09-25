@@ -7,7 +7,7 @@ export const getImages = async () => {
   const day = _getDay();
   let images: any[];
   if (window.location.href.includes('localhost:5173')) {
-    images = (await import('../testData')).testImages;
+    images = (await import('../mockQueryResult')).testImages;
   } else {
     images = await fetch(
       API_URL +
@@ -21,7 +21,7 @@ export const getImages = async () => {
         console.error(error);
       });
   }
-  return _shuffle(images, day);
+  // return _shuffle(images, day);
 };
 
 const _getDay = () => {
