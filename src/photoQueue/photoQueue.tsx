@@ -32,7 +32,7 @@ export const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
   const [index, setIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [choiceKeeper, setChoiceKeeper] = useState<Array<boolean>>([]);
-  const [disableButtons, setDisableButtons] = useState(false);
+  const [disableButtons, setDisableButtons] = useState(true);
   const shareButton = useRef<HTMLButtonElement>(null);
   const image = useRef<HTMLImageElement>(null);
   const parentBox = useRef<HTMLDivElement>(null);
@@ -163,93 +163,111 @@ export const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
     }
   };
 
-  if (images.length) {
-    return (
-      <div className='w-full'>
-        <FloatButton
-          tooltip='How to play'
-          icon={<QuestionCircleOutlined />}
-          onClick={() => setOpenTour(true)}
-        />
+  useEffect(() => {
+    if (images.length) {
+      setDisableButtons(false);
+      console.log('enabling');
+    }
+  }, [images]);
 
-        <Flex align='center' justify='center'>
+  return (
+    <div className='w-full'>
+      <FloatButton
+        tooltip='How to play'
+        icon={<QuestionCircleOutlined />}
+        onClick={() => setOpenTour(true)}
+      />
+
+      <Flex align='center' justify='center'>
+        <div ref={parentBox} className='w-10/12' style={{ maxWidth: '512px' }}>
+          <Progress
+            size={[parentBox.current?.offsetWidth ?? 0, 10]}
+            percent={
+              images.length
+                ? disableButtons
+                  ? 100
+                  : (index / images.length) * 100
+                : 0
+            }
+            showInfo={false}
+          />
           <div
-            ref={parentBox}
-            className='w-10/12'
-            style={{ maxWidth: '512px' }}
+            ref={imageTourStep}
+            className='flex justify-center relative rounded-lg overflow-hidden mb-8'
+            style={{ backgroundColor: undefined }}
           >
-            <Progress
-              size={[parentBox.current?.offsetWidth ?? 0, 10]}
-              percent={disableButtons ? 100 : (index / images.length) * 100}
-              showInfo={false}
-            />
-            <div
-              ref={imageTourStep}
-              className='flex justify-center relative rounded-lg overflow-hidden mb-8'
-              style={{ backgroundColor: undefined }}
-            >
+            {images.length ? (
               <img
                 ref={image}
                 className='w-auto flex-auto'
                 src={`data:image/png;base64,${images[index].data}`}
               />
-              <div className='opacity-75 absolute w-full h-full'>
-                {feedbackOverlay}
-              </div>
-            </div>
-            <div ref={buttonsTourStep}>
-              <PhotoQueueButtons
-                makeChoice={makeChoice}
-                disabled={disableButtons}
-              />
-            </div>
-            <Modal
-              title='Well Played!'
-              open={isModalOpen}
-              width={'600px'}
-              style={{ maxWidth: '95vw' }}
-              footer={[
-                <Button
-                  ref={shareButton}
-                  type='default'
-                  key='shareButton'
-                  onClick={() => shareButtonCopy()}
+            ) : (
+              <div
+                style={{ width: '512px' }}
+                className='rounded-xl bg-zinc-900 aspect-square'
+              >
+                <Flex
+                  align='center'
+                  justify='center'
+                  vertical
+                  className='w-full h-full -mt-8'
                 >
-                  <CopyOutlined />
-                  Copy score
-                </Button>,
-              ]}
-              onCancel={() => setIsModalOpen(false)}
-            >
-              <div className='text-center grid gap-6 grid-cols-1'>
-                <p className='text-2xl'>
-                  You got {score} out of {images.length} correct!
-                </p>
-                <Carousel
-                  arrows
-                  dotPosition='left'
-                  infinite={false}
-                  className='flex gap-4'
-                >
-                  {answers}
-                </Carousel>
+                  <img width='192px' src={loadingGif} />
+                  <p className='text-center'>Loading images...</p>
+                </Flex>
               </div>
-            </Modal>
+            )}
+
+            <div className='opacity-75 absolute w-full h-full'>
+              {feedbackOverlay}
+            </div>
           </div>
-          <Tour
-            open={openTour}
-            onClose={() => setOpenTour(false)}
-            steps={steps}
-          />
-        </Flex>
-      </div>
-    );
-  } else {
-    return (
-      <Flex align='center' justify='center' className='w-screen' vertical>
-        <img width='192px' src={loadingGif} />
-        <p className='text-center'>Loading images...</p>
+          <div ref={buttonsTourStep}>
+            <PhotoQueueButtons
+              makeChoice={makeChoice}
+              disabled={disableButtons}
+            />
+          </div>
+          <Modal
+            title='Well Played!'
+            open={isModalOpen}
+            width={'600px'}
+            style={{ maxWidth: '95vw' }}
+            footer={[
+              <Button
+                ref={shareButton}
+                type='default'
+                key='shareButton'
+                onClick={() => shareButtonCopy()}
+              >
+                <CopyOutlined />
+                Copy score
+              </Button>,
+            ]}
+            onCancel={() => setIsModalOpen(false)}
+          >
+            <div className='text-center grid gap-6 grid-cols-1'>
+              <p className='text-2xl'>
+                You got {score} out of {images.length} correct!
+              </p>
+              <Carousel
+                arrows
+                dotPosition='left'
+                infinite={false}
+                className='flex gap-4'
+              >
+                {answers}
+              </Carousel>
+            </div>
+          </Modal>
+        </div>
+        <Tour
+          open={openTour}
+          onClose={() => setOpenTour(false)}
+          steps={steps}
+        />
       </Flex>
-    );
-  }
+    </div>
+  );
 };

@@ -5,23 +5,18 @@ const MS_PER_DAY = 86400000;
 
 export const getImages = async () => {
   const day = _getDay();
-  let images: any[];
-  if (window.location.href.includes('localhost:5173')) {
-    images = (await import('../mockQueryResult')).testImages;
-  } else {
-    images = await fetch(
-      API_URL +
-        '?' +
-        new URLSearchParams({
-          day: `${day}`,
-        }).toString(),
-    )
-      .then((res) => res.json())
-      .catch((error) => {
-        console.error(error);
-      });
-  }
-  // return _shuffle(images, day);
+  const images = await fetch(
+    API_URL +
+      '?' +
+      new URLSearchParams({
+        day: `${day}`,
+      }).toString(),
+  )
+    .then((res) => res.json())
+    .catch((error) => {
+      console.error(error);
+    });
+  return _shuffle(images, day);
 };
 
 const _getDay = () => {
