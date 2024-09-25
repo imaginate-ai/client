@@ -1,4 +1,4 @@
-import { JSX, useEffect, useRef } from 'react';
+import { JSX, useEffect, useRef, useState } from 'react';
 import { PhotoQueueButtonProps } from './interfaces/PhotoQueueProps.ts';
 import { Button } from 'antd';
 
@@ -8,10 +8,11 @@ export const PhotoQueueButtons = ({
 }: PhotoQueueButtonProps): JSX.Element => {
   const AiButton = useRef<HTMLButtonElement>(null);
   const RealButton = useRef<HTMLButtonElement>(null);
+  const [aiButtonDisabled, setAiButtonDisabled] = useState(true);
+  const [realButtonDisabled, setRealButtonDisabled] = useState(true);
 
   const clickHandler = (target: HTMLElement) => {
     let choseReal: boolean;
-
     if (AiButton?.current && RealButton?.current) {
       buttonsDisabled(true);
       if (target.textContent === 'A.I.') {
@@ -31,13 +32,8 @@ export const PhotoQueueButtons = ({
 
   const buttonsDisabled = (value: boolean) => {
     if (AiButton?.current && RealButton?.current) {
-      if (value) {
-        AiButton.current.setAttribute('disabled', 'true');
-        RealButton.current.setAttribute('disabled', 'true');
-      } else {
-        AiButton.current.removeAttribute('disabled');
-        RealButton.current.removeAttribute('disabled');
-      }
+      setAiButtonDisabled(value);
+      setRealButtonDisabled(value);
     }
   };
 
@@ -51,7 +47,7 @@ export const PhotoQueueButtons = ({
         ref={AiButton}
         type='primary'
         className={'choiceButton mb-2 w-full h-full text-body'}
-        disabled
+        disabled={aiButtonDisabled}
         onClick={(event) => clickHandler(event.target as HTMLElement)}
       >
         A.I.
@@ -60,7 +56,7 @@ export const PhotoQueueButtons = ({
         ref={RealButton}
         type='primary'
         className={'choiceButton mb-2 w-full h-full text-body'}
-        disabled
+        disabled={realButtonDisabled}
         onClick={(event) => clickHandler(event.target as HTMLElement)}
       >
         Real

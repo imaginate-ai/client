@@ -166,7 +166,6 @@ export const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
   useEffect(() => {
     if (images.length) {
       setDisableButtons(false);
-      console.log('enabling');
     }
   }, [images]);
 
