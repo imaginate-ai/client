@@ -156,7 +156,7 @@ export const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
     if (shareButton.current) {
       if (completeScoreText) {
         navigator.clipboard.writeText(completeScoreText);
-        shareButton.current.innerHTML = 'Score copied!';
+        shareButton.current.innerHTML = '🎉 Score copied!';
       } else {
         shareButton.current.textContent = 'Something went wrong :(';
       }
@@ -233,20 +233,16 @@ export const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
             open={isModalOpen}
             width={'600px'}
             style={{ maxWidth: '95vw' }}
-            footer={[
-              <Button
-                ref={shareButton}
-                type='default'
-                key='shareButton'
-                onClick={() => shareButtonCopy()}
-              >
-                <CopyOutlined />
-                Copy score
-              </Button>,
-            ]}
+            footer={null}
             onCancel={() => setIsModalOpen(false)}
           >
-            <div className='text-center grid gap-6 grid-cols-1'>
+            <Flex
+              justify='center'
+              align='center'
+              gap={'1rem'}
+              className='text-center'
+              vertical
+            >
               <p className='text-2xl'>
                 You got {score} out of {images.length} correct!
               </p>
@@ -258,7 +254,19 @@ export const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
               >
                 {answers}
               </Carousel>
-            </div>
+              <div className='p-1 share-button-border rounded-full'>
+                <Button
+                  className='p-8 text-xl rounded-full '
+                  ref={shareButton}
+                  type='default'
+                  key='shareButton'
+                  onClick={() => shareButtonCopy()}
+                >
+                  <CopyOutlined className='mr-2' />
+                  Share score
+                </Button>
+              </div>
+            </Flex>
           </Modal>
         </div>
         <Tour

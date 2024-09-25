@@ -63,3 +63,36 @@ p {
 .ant-tour {
   max-width: 100vw !important;
 }
+
+.share-button-border {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.9);
+  background: linear-gradient(
+    -45deg,
+    #ffa63d,
+    #ff3d77,
+    #338aff,
+    #3cf0c5,
+    #ffa63d,
+    #ff3d77
+  );
+  background-size: 600%;
+  -webkit-animation: animate 5s linear infinite;
+  animation: animate 5s linear infinite;
+}
+@-webkit-keyframes animate {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+@keyframes animate {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
