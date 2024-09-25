@@ -5,7 +5,7 @@ const MS_PER_DAY = 86400000;
 
 export const getImages = async () => {
   const day = _getDay();
-  const images: any[] = await fetch(
+  const images = await fetch(
     API_URL +
       '?' +
       new URLSearchParams({

@@ -1,4 +1,4 @@
-import { JSX, useRef } from 'react';
+import { JSX, useEffect, useRef } from 'react';
 import { PhotoQueueButtonProps } from './interfaces/PhotoQueueProps.ts';
 import { Button } from 'antd';
 
@@ -41,9 +41,9 @@ export const PhotoQueueButtons = ({
     }
   };
 
-  if (disabled) {
-    buttonsDisabled(true);
-  }
+  useEffect(() => {
+    buttonsDisabled(disabled);
+  }, [disabled]);
 
   return (
     <div className='flex flex-row gap-8 h-16'>
@@ -51,6 +51,7 @@ export const PhotoQueueButtons = ({
         ref={AiButton}
         type='primary'
         className={'choiceButton mb-2 w-full h-full text-body'}
+        disabled
         onClick={(event) => clickHandler(event.target as HTMLElement)}
       >
         A.I.
@@ -59,6 +60,7 @@ export const PhotoQueueButtons = ({
         ref={RealButton}
         type='primary'
         className={'choiceButton mb-2 w-full h-full text-body'}
+        disabled
         onClick={(event) => clickHandler(event.target as HTMLElement)}
       >
         Real
