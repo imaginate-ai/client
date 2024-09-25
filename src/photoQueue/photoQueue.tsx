@@ -14,11 +14,11 @@ import {
   CloseOutlined,
   CheckOutlined,
   CopyOutlined,
-  LoadingOutlined,
   QuestionCircleOutlined,
 } from '@ant-design/icons';
 import Cookies from 'universal-cookie';
 import { PhotoQueueButtons } from './photoQueueButtons.tsx';
+import loadingGif from '../assets/loading.gif';
 const septemberFirstTimeStamp = 1725148800000;
 const septemberFirst = new Date(septemberFirstTimeStamp).setHours(0, 0, 0, 0);
 const msPerDay = 86400000;
@@ -246,8 +246,9 @@ export const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
     );
   } else {
     return (
-      <Flex justify='center' className='w-screen'>
-        <LoadingOutlined className='text-5xl' />
+      <Flex align='center' justify='center' className='w-screen' vertical>
+        <img width='192px' src={loadingGif} />
+        <p className='text-center'>Loading images...</p>
       </Flex>
     );
   }
