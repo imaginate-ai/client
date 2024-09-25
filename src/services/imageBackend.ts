@@ -7,6 +7,7 @@ export const getImages = async () => {
   const day = _getDay();
   let images: any[];
   if (window.location.href.includes('localhost:5173')) {
+    await _fakeLoadDelay(2500);
     images = (await import('../mockQueryResult')).testImages;
   } else {
     images = await fetch(
@@ -21,7 +22,7 @@ export const getImages = async () => {
         console.error(error);
       });
   }
-  // return _shuffle(images, day);
+  return _shuffle(images, day);
 };
 
 const _getDay = () => {
@@ -48,4 +49,8 @@ function _shuffle(array: any[], seed: number) {
 function _random(seed: number) {
   var x = Math.sin(seed++) * 10000;
   return x - Math.floor(x);
+}
+
+function _fakeLoadDelay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
