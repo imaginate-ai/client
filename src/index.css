@@ -96,3 +96,7 @@ p {
     background-position: 100% 50%;
   }
 }
+
+.ant-carousel {
+  width: 100%;
+}

@@ -19,6 +19,7 @@ import {
 import Cookies from 'universal-cookie';
 import { PhotoQueueButtons } from './photoQueueButtons.tsx';
 import loadingGif from '../assets/loading.gif';
+import posthog from 'posthog-js';
 const septemberFirstTimeStamp = 1725148800000;
 const septemberFirst = new Date(septemberFirstTimeStamp).setHours(0, 0, 0, 0);
 const msPerDay = 86400000;
@@ -113,6 +114,13 @@ export const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
         setDisableButtons(true);
         const today = new Date();
         cookies.set('day_last_played', today.setHours(0, 0, 0, 0));
+        posthog.capture('completed_game', {
+          score: score,
+          length: images.length,
+          grade: score / images.length,
+          day: today.setHours(0, 0, 0, 0),
+          theme: images[0].theme,
+        });
       }
       setFeedbackOverlay(undefined);
       choiceCallBack();
@@ -131,7 +139,7 @@ export const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
     );
 
     return (
-      <div className='p-8' key={image.filename}>
+      <div className='p-8' key={image.url}>
         <div className='flex justify-center '>
           <div className='relative p-4'>
             <img
@@ -140,7 +148,6 @@ export const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
                 (userChoseCorrectly ? 'border-green-500' : 'border-red-500')
               }
               style={{ maxWidth: '100%' }}
-              key={image.url}
               src={`data:image/png;base64,${image.data}`}
             />
             {feedbackIcon}
@@ -157,6 +164,7 @@ export const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
       if (completeScoreText) {
         navigator.clipboard.writeText(completeScoreText);
         shareButton.current.innerHTML = '🎉 Score copied!';
+        posthog.capture('score_copied');
       } else {
         shareButton.current.textContent = 'Something went wrong :(';
       }
@@ -174,7 +182,10 @@ export const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
       <FloatButton
         tooltip='How to play'
         icon={<QuestionCircleOutlined />}
-        onClick={() => setOpenTour(true)}
+        onClick={() => {
+          setOpenTour(true);
+          posthog.capture('tour_triggered');
+        }}
       />
 
       <Flex align='center' justify='center'>
@@ -229,12 +240,19 @@ export const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
             />
           </div>
           <Modal
-            title='Well Played!'
+            title=''
             open={isModalOpen}
             width={'600px'}
-            style={{ maxWidth: '95vw' }}
+            style={{
+              maxWidth: '95vw',
+              maxHeight: '95vh',
+              top: '1rem',
+              height: '100%',
+            }}
             footer={null}
-            onCancel={() => setIsModalOpen(false)}
+            onCancel={() => {
+              setIsModalOpen(false);
+            }}
           >
             <Flex
               justify='center'
@@ -251,10 +269,11 @@ export const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
                 dotPosition='left'
                 infinite={false}
                 className='flex gap-4'
+                style={{ width: '100%' }}
               >
                 {answers}
               </Carousel>
-              <div className='p-1 share-button-border rounded-full'>
+              <div className='p-1 m-8 share-button-border rounded-full'>
                 <Button
                   className='p-8 text-xl rounded-full '
                   ref={shareButton}
