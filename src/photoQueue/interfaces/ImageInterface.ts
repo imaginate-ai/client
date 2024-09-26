@@ -1,6 +1,6 @@
 export interface Image {
   data: string;
-  date: string;
+  date: number;
   filename: string;
   real: boolean;
   status: 'verified';
