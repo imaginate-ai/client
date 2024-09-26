@@ -86,15 +86,27 @@ function App() {
           <div className='text-center m-8'>
             <p>
               Made by{' '}
-              <a href='https://faisal-fawad.github.io' target='_blank'>
+              <a
+                href='https://faisal-fawad.github.io'
+                onClick={() => posthog.capture('faisal_link_click')}
+                target='_blank'
+              >
                 Faisal
               </a>
               ,{' '}
-              <a href='https://nathanprobert.ca' target='_blank'>
+              <a
+                href='https://nathanprobert.ca'
+                onClick={() => posthog.capture('nate_link_click')}
+                target='_blank'
+              >
                 Nate
               </a>
               , and{' '}
-              <a href='https://zachlegesse.ca' target='_blank'>
+              <a
+                href='https://zachlegesse.ca'
+                onClick={() => posthog.capture('zach_link_click')}
+                target='_blank'
+              >
                 Zach
               </a>
             </p>
