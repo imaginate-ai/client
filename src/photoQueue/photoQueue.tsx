@@ -157,11 +157,16 @@ export const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
     );
   });
 
-  const shareButtonCopy = () => {
+  const share = () => {
     const completeScoreText = cookies.get('last_complete_score_text');
     if (shareButton.current) {
       if (completeScoreText) {
-        navigator.clipboard.writeText(completeScoreText);
+        const shareData = {
+          title: 'Imaginate',
+          text: completeScoreText,
+          url: 'https://playimaginate.com',
+        };
+        navigator.share(shareData);
         shareButton.current.innerHTML = '🎉 Score copied!';
         posthog.capture('score_copied');
       } else {
@@ -278,7 +283,7 @@ export const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
                   ref={shareButton}
                   type='default'
                   key='shareButton'
-                  onClick={() => shareButtonCopy()}
+                  onClick={() => share()}
                 >
                   <CopyOutlined className='mr-2' />
                   Share score
