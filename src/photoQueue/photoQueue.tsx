@@ -159,9 +159,14 @@ export const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
 
   const share = async () => {
     const completeScoreText = cookies.get('last_complete_score_text');
+    const isMobile = () => {
+      const regex =
+        /Mobi|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+      return regex.test(navigator.userAgent);
+    };
     if (shareButton.current) {
       try {
-        if (!!screen.orientation) {
+        if (isMobile()) {
           const shareData = {
             title: 'Imaginate',
             text: completeScoreText,
@@ -175,8 +180,9 @@ export const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
         }
         posthog.capture('score_shared');
       } catch (err) {
-        shareButton.current.innerHTML = 'Something went wrong...';
-        posthog.capture('score_share_error', { error: err });
+        if (err instanceof DOMException && err.name !== 'AbortError') {
+          shareButton.current.innerHTML = 'Something went wrong...';
+        }
       }
     }
   };
