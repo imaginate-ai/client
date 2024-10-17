@@ -157,15 +157,32 @@ export const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
     );
   });
 
-  const shareButtonCopy = () => {
+  const share = async () => {
     const completeScoreText = cookies.get('last_complete_score_text');
+    const isMobile = () => {
+      const regex =
+        /Mobi|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+      return regex.test(navigator.userAgent);
+    };
     if (shareButton.current) {
-      if (completeScoreText) {
-        navigator.clipboard.writeText(completeScoreText);
-        shareButton.current.innerHTML = '🎉 Score copied!';
-        posthog.capture('score_copied');
-      } else {
-        shareButton.current.textContent = 'Something went wrong :(';
+      try {
+        if (isMobile()) {
+          const shareData = {
+            title: 'Imaginate',
+            text: completeScoreText,
+            url: 'https://playimaginate.com',
+          };
+          await navigator.share(shareData);
+          shareButton.current.innerHTML = '🎉 Score shared!';
+        } else {
+          await navigator.clipboard.writeText(completeScoreText);
+          shareButton.current.innerHTML = '🎉 Score copied!';
+        }
+        posthog.capture('score_shared');
+      } catch (err) {
+        if (err instanceof DOMException && err.name !== 'AbortError') {
+          shareButton.current.innerHTML = 'Something went wrong...';
+        }
       }
     }
   };
@@ -278,7 +295,7 @@ export const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
                   ref={shareButton}
                   type='default'
                   key='shareButton'
-                  onClick={() => shareButtonCopy()}
+                  onClick={() => share()}
                 >
                   <CopyOutlined className='mr-2' />
                   Share score
