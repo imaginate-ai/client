@@ -157,20 +157,26 @@ export const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
     );
   });
 
-  const share = () => {
+  const share = async () => {
     const completeScoreText = cookies.get('last_complete_score_text');
     if (shareButton.current) {
-      if (completeScoreText) {
-        const shareData = {
-          title: 'Imaginate',
-          text: completeScoreText,
-          url: 'https://playimaginate.com',
-        };
-        navigator.share(shareData);
-        shareButton.current.innerHTML = '🎉 Score copied!';
-        posthog.capture('score_copied');
-      } else {
-        shareButton.current.textContent = 'Something went wrong :(';
+      try {
+        if (!!screen.orientation) {
+          const shareData = {
+            title: 'Imaginate',
+            text: completeScoreText,
+            url: 'https://playimaginate.com',
+          };
+          await navigator.share(shareData);
+          shareButton.current.innerHTML = '🎉 Score shared!';
+        } else {
+          await navigator.clipboard.writeText(completeScoreText);
+          shareButton.current.innerHTML = '🎉 Score copied!';
+        }
+        posthog.capture('score_shared');
+      } catch (err) {
+        shareButton.current.innerHTML = 'Something went wrong...';
+        posthog.capture('score_share_error', { error: err });
       }
     }
   };
