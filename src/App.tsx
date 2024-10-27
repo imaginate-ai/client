@@ -27,11 +27,6 @@ function App() {
     });
   }, []);
 
-  posthog.init('phc_TrQqpxDjEZAOLzSUBk8DKJF8UzhBj4sbkhe6YOSxYxe', {
-    api_host: 'https://us.i.posthog.com',
-    person_profiles: 'identified_only', // or 'always' to create profiles for anonymous users as well
-  });
-
   const splitNewlinesToParagraphTags = (input: string) => {
     return input.split('\n').map((text) => <p key={text}>{text}</p>);
   };
