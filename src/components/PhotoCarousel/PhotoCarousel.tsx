@@ -3,9 +3,9 @@ import { Choice } from '../../types/Image.types';
 import { CloseOutlined, CheckOutlined } from '@ant-design/icons';
 import { useMemo } from 'react';
 
-interface PhotoCarouselProps {
+type PhotoCarouselProps = {
   choices: Choice[];
-}
+};
 
 const PhotoCarousel = ({ choices }: PhotoCarouselProps) => {
   const answers = useMemo(() => {

@@ -5,9 +5,9 @@ import './NavBar.css';
 
 const THEME_EXPLAINER_TEXT = 'The theme changes every day!';
 
-interface NavBarProps {
+type NavBarProps = {
   theme: string | undefined;
-}
+};
 
 const NavBar = ({ theme }: NavBarProps) => {
   return (
