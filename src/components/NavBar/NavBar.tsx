@@ -1,12 +1,15 @@
 import { Divider, Flex, Tooltip } from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
-import logo from '../assets/imaginate-logo.png';
-import './Navbar.css';
-import { NavBarProps } from '../interfaces/NavBarProps';
+import logo from '../../assets/imaginate-logo.png';
+import './NavBar.css';
 
 const THEME_EXPLAINER_TEXT = 'The theme changes every day!';
 
-const Navbar = ({ theme }: NavBarProps) => {
+interface NavBarProps {
+  theme: string | undefined;
+}
+
+const NavBar = ({ theme }: NavBarProps) => {
   return (
     <div className='w-full'>
       <Flex align='flex-end' justify='space-between' wrap>
@@ -30,4 +33,4 @@ const Navbar = ({ theme }: NavBarProps) => {
   );
 };
 
-export default Navbar;
+export default NavBar;
