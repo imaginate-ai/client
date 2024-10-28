@@ -1,25 +1,26 @@
 import { useState, useRef, ReactElement, useEffect } from 'react';
 import './App.css';
-import Navbar from './navigation/Navbar';
+import NavBar from './components/NavBar/NavBar.tsx';
 import { ConfigProvider, theme, Flex } from 'antd';
 
 import posthog from 'posthog-js';
-import Cookies from 'universal-cookie';
-import { PhotoQueue } from './photoQueue/photoQueue.tsx';
-import { getImages } from './services/imageBackend.ts';
-import { Image } from './photoQueue/interfaces/ImageInterface.ts';
+import PhotoQueue from './components/PhotoQueue/PhotoQueue.tsx';
+import { getImages } from './services/Image.service.ts';
+import { Choice, Image } from './types/Image.types.ts';
+import { calculateDay } from './services/Day.service.ts';
+import { generateScoreHTML } from './services/Score.service.tsx';
 
-const cookies = new Cookies();
+const day = calculateDay();
 
 function App() {
   const { darkAlgorithm } = theme;
   const [showApp, setShowApp] = useState(true);
-  const savedScoreString = useRef<ReactElement>();
+  const scoreText = useRef<ReactElement>();
   const [images, setImages] = useState<Image[]>([]);
   const [imageTheme, setImageTheme] = useState('');
 
   useEffect(() => {
-    getImages().then((response: Image[]) => {
+    getImages().then((response: Image[] | undefined) => {
       if (response) {
         setImages(response);
         setImageTheme(response[0].theme);
@@ -27,23 +28,18 @@ function App() {
     });
   }, []);
 
-  const splitNewlinesToParagraphTags = (input: string) => {
-    return input.split('\n').map((text) => <p key={text}>{text}</p>);
-  };
 
   useEffect(() => {
-    const dayLastPlayed = new Date(cookies.get('day_last_played'));
-    const completeScoreText: string = cookies.get('last_complete_score_text');
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    if (
-      dayLastPlayed.toDateString() === today.toDateString() &&
-      completeScoreText
-    ) {
-      setShowApp(false);
-      savedScoreString.current = (
-        <div>{splitNewlinesToParagraphTags(completeScoreText)}</div>
-      );
+    const storedDayLastPlayed = Number(localStorage.getItem('day_last_played'));
+    const storedLastChoiceKeeper = localStorage.getItem('last_choice_keeper');
+    if (storedDayLastPlayed && storedLastChoiceKeeper) {
+      const today = new Date().setHours(0, 0, 0, 0);
+      const dayLastPlayed = new Date(storedDayLastPlayed).setHours(0, 0, 0, 0);
+      const lastChoiceKeeper: Choice[] = JSON.parse(storedLastChoiceKeeper);
+      if (dayLastPlayed === today) {
+        setShowApp(false);
+        scoreText.current = generateScoreHTML(lastChoiceKeeper, day);
+      }
     }
   }, []);
 
@@ -51,7 +47,7 @@ function App() {
     <div className='text-center'>
       <p className='font-semibold mb-2'>You already played today!</p>
       <p className='font-semibold mb-2'>See you again tomorrow :)</p>
-      {savedScoreString.current}
+      {scoreText.current}
     </div>
   );
 
@@ -69,7 +65,7 @@ function App() {
           className='h-full w-full '
           vertical
         >
-          <Navbar theme={imageTheme} />
+          <NavBar theme={imageTheme} />
           <Flex
             align='center'
             justify='space-evenly'
