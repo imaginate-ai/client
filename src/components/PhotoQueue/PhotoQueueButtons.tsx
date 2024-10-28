@@ -1,8 +1,8 @@
 import { JSX, useEffect, useRef, useState } from 'react';
-import { PhotoQueueButtonProps } from './interfaces/PhotoQueueProps.ts';
+import { PhotoQueueButtonProps } from './PhotoQueue.types';
 import { Button } from 'antd';
 
-export const PhotoQueueButtons = ({
+const PhotoQueueButtons = ({
   makeChoice,
   disabled,
 }: PhotoQueueButtonProps): JSX.Element => {
@@ -64,3 +64,5 @@ export const PhotoQueueButtons = ({
     </div>
   );
 };
+
+export default PhotoQueueButtons;
