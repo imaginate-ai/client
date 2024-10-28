@@ -3,9 +3,9 @@ import { useRef } from 'react';
 import { CopyOutlined } from '@ant-design/icons';
 import posthog from 'posthog-js';
 
-interface shareButtonProps {
+type shareButtonProps = {
   scoreText: string | undefined;
-}
+};
 
 const ShareButton = ({ scoreText }: shareButtonProps) => {
   const shareButton = useRef<HTMLButtonElement>(null);
