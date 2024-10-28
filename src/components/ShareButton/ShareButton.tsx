@@ -10,14 +10,31 @@ interface shareButtonProps {
 const ShareButton = ({ scoreText }: shareButtonProps) => {
   const shareButton = useRef<HTMLButtonElement>(null);
 
-  const share = () => {
-    if (shareButton.current) {
-      if (scoreText) {
-        navigator.clipboard.writeText(scoreText);
-        shareButton.current.innerHTML = '🎉 Score copied!';
-        posthog.capture('score_copied');
-      } else {
-        shareButton.current.textContent = 'Something went wrong :(';
+  const share = async () => {
+    const isMobile = () => {
+      const regex =
+        /Mobi|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+      return regex.test(navigator.userAgent);
+    };
+    if (shareButton.current && scoreText) {
+      try {
+        if (isMobile()) {
+          const shareData = {
+            title: 'Imaginate',
+            text: scoreText,
+            url: 'https://playimaginate.com',
+          };
+          await navigator.share(shareData);
+          shareButton.current.innerHTML = '🎉 Score shared!';
+        } else {
+          await navigator.clipboard.writeText(scoreText);
+          shareButton.current.innerHTML = '🎉 Score copied!';
+        }
+        posthog.capture('score_shared');
+      } catch (err) {
+        if (err instanceof DOMException && err.name !== 'AbortError') {
+          shareButton.current.innerHTML = 'Something went wrong...';
+        }
       }
     }
   };
