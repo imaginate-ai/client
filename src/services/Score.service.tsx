@@ -1,17 +1,16 @@
 import { Choice } from '../types/Image.types';
 
 export const generateScoreText = (choices: Choice[], day: number): string => {
-  const header = buildHeader(day);
-  const emojiText = buildEmoji(choices);
-  return header + '\n' + emojiText;
+  return buildHeader(day) + '\n' + buildEmoji(choices);
 };
 
 export const generateScoreHTML = (choices: Choice[], day: number) => {
-  const lines: string[] = [];
-  lines.push(buildHeader(day));
-  lines.push(buildEmoji(choices));
-  const result = lines.map((line) => <p>{line}</p>);
-  return <div>{result}</div>;
+  return (
+    <div>
+      <p>{buildHeader(day)}</p>
+      <p>{buildEmoji(choices)}</p>
+    </div>
+  );
 };
 
 const buildHeader = (day: number) => {
