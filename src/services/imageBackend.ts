@@ -18,7 +18,7 @@ export const getImages = async () => {
   return _shuffle(images, day);
 };
 
-const _getDay = () => {
+export const _getDay = () => {
   const today = new Date().setHours(0, 0, 0, 0);
   const msSinceStartDate = today - START_DATE;
   return Math.floor(msSinceStartDate / MS_PER_DAY);

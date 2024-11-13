@@ -20,10 +20,8 @@ import Cookies from 'universal-cookie';
 import { PhotoQueueButtons } from './photoQueueButtons.tsx';
 import loadingGif from '../assets/loading.gif';
 import posthog from 'posthog-js';
-const septemberFirst = new Date(2024, 8, 1).setHours(0, 0, 0, 0);
-const msPerDay = 86400000;
-const today = new Date().setHours(0, 0, 0, 0);
-const imaginateDay = (today - septemberFirst) / msPerDay;
+import { _getDay } from '../services/imageBackend.ts';
+const imaginateDay = _getDay();
 
 const cookies = new Cookies();
 
