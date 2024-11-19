@@ -2,6 +2,8 @@ import { Divider, Flex, Tooltip } from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import logo from '../../assets/imaginate-logo.png';
 import './NavBar.css';
+import { useAuth } from '../../providers/AuthProvider';
+import AuthButton from '../Auth/AuthButton';
 
 const THEME_EXPLAINER_TEXT = 'The theme changes every day!';
 
@@ -10,11 +12,12 @@ type NavBarProps = {
 };
 
 const NavBar = ({ theme }: NavBarProps) => {
+  const auth = useAuth();
   return (
-    <div className='w-full'>
+    <div className='w-full px-4'>
       <Flex align='flex-end' justify='space-between' wrap>
-        <img className='h-10 mx-4 mt-6' src={logo} />
-        <div className='mx-4 mt-4'>
+        <img className='h-10 mt-6' src={logo} />
+        <Flex align='center' justify='space-between' gap={'16px'}>
           <Tooltip title={THEME_EXPLAINER_TEXT} placement='bottomLeft'>
             {theme ? (
               <Flex>
@@ -26,7 +29,8 @@ const NavBar = ({ theme }: NavBarProps) => {
               ''
             )}
           </Tooltip>
-        </div>
+          <AuthButton />
+        </Flex>
       </Flex>
       <Divider />
     </div>
