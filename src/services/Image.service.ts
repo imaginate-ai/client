@@ -1,36 +1,29 @@
 import { Image } from '../types/Image.types.ts';
-import { calculateDay } from './Day.service';
+import { calculateDay } from './Day.service.ts';
 
-const API_URL =
-  'https://o7hgv46qcf7swox3ygn53tayay0zzhgl.lambda-url.us-east-1.on.aws/';
-
-export const getImages = await (async () => {
-  let cachedImages: Image[];
+export const getImages = (() => {
+  let cachedImages: Promise<Image[]>;
 
   return async () => {
     if (cachedImages) {
       return cachedImages;
     }
     const day = calculateDay();
-    let images;
+    console.log(import.meta.env.VITE_API_URL);
     try {
-      images = await fetch(
-        API_URL +
-          '?' +
-          new URLSearchParams({
-            day: `${day}`,
-          }).toString(),
+      const imageResponse = await fetch(
+        `${import.meta.env.VITE_API_URL}/date/${day}/images`,
       ).then((res) => res.json());
+      cachedImages = Promise.resolve(_shuffle(imageResponse, day));
     } catch (err) {
       console.error(err);
       return;
     }
-    cachedImages = _shuffle(images, day);
     return cachedImages;
   };
 })();
 
-function _shuffle(array: any[], seed: number) {
+function _shuffle(array: Image[], seed: number) {
   var m = array.length,
     t,
     i;
