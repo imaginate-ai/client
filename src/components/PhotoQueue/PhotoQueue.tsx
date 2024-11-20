@@ -1,37 +1,23 @@
 import { useState, JSX, useRef, ReactElement, useEffect } from 'react';
-import { PhotoQueueProps } from './interfaces/PhotoQueueProps.ts';
-import {
-  Modal,
-  Button,
-  Carousel,
-  Progress,
-  Flex,
-  Tour,
-  TourProps,
-  FloatButton,
-} from 'antd';
+import { PhotoQueueProps } from './PhotoQueue.types.ts';
+import { Modal, Progress, Flex, Tour, TourProps, FloatButton } from 'antd';
 import {
   CloseOutlined,
   CheckOutlined,
-  CopyOutlined,
   QuestionCircleOutlined,
 } from '@ant-design/icons';
-import Cookies from 'universal-cookie';
-import { PhotoQueueButtons } from './photoQueueButtons.tsx';
-import loadingGif from '../assets/loading.gif';
+import PhotoQueueButtons from './PhotoQueueButtons.tsx';
+import loadingGif from '../../assets/loading.gif';
 import posthog from 'posthog-js';
-import { _getDay } from '../services/imageBackend.ts';
-const imaginateDay = _getDay();
+import GameRecap from '../GameRecap/GameRecap.tsx';
+import { Choice } from '../../types/Image.types.ts';
 
-const cookies = new Cookies();
-
-export const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
+const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
   const [score, setScore] = useState(0);
   const [index, setIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [choiceKeeper, setChoiceKeeper] = useState<Array<boolean>>([]);
+  const [choiceKeeper, setChoiceKeeper] = useState<Array<Choice>>([]);
   const [disableButtons, setDisableButtons] = useState(true);
-  const shareButton = useRef<HTMLButtonElement>(null);
   const image = useRef<HTMLImageElement>(null);
   const parentBox = useRef<HTMLDivElement>(null);
   const [feedbackOverlay, setFeedbackOverlay] = useState<ReactElement>();
@@ -64,22 +50,9 @@ export const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
     },
   ];
 
-  const generateCompleteScoreText = () => {
-    const scoreText = 'Imaginate #' + imaginateDay;
-    let emojiScoreText;
-    emojiScoreText = choiceKeeper
-      .map((correctChoice) => (correctChoice ? '🟩' : '🟥'))
-      .join('');
-    if (choiceKeeper.every((val) => val === choiceKeeper[0])) {
-      emojiScoreText += '✨';
-    }
-    return scoreText + '\n' + emojiScoreText;
-  };
-
   useEffect(() => {
     if (choiceKeeper.length) {
-      const completeScoreText = generateCompleteScoreText();
-      cookies.set('last_complete_score_text', completeScoreText);
+      localStorage.setItem('last_choice_keeper', JSON.stringify(choiceKeeper));
     }
   }, [choiceKeeper]);
 
@@ -93,14 +66,20 @@ export const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
           <CheckOutlined className='text-9xl text-green-800' />
         </div>,
       );
-      setChoiceKeeper([...choiceKeeper, true]);
+      setChoiceKeeper([
+        ...choiceKeeper,
+        { isCorrect: true, image: images[index] },
+      ]);
     } else {
       setFeedbackOverlay(
         <div className=' absolute w-full h-full content-center text-center bg-red-500'>
           <CloseOutlined className='text-9xl text-red-800' />
         </div>,
       );
-      setChoiceKeeper([...choiceKeeper, false]);
+      setChoiceKeeper([
+        ...choiceKeeper,
+        { isCorrect: false, image: images[index] },
+      ]);
     }
 
     setTimeout(() => {
@@ -109,13 +88,13 @@ export const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
       } else {
         setIsModalOpen(true);
         setDisableButtons(true);
-        const today = new Date();
-        cookies.set('day_last_played', today.setHours(0, 0, 0, 0));
+        const today = new Date().setHours(0, 0, 0, 0);
+        localStorage.setItem('day_last_played', today.toString());
         posthog.capture('completed_game', {
           score: score,
           length: images.length,
           grade: score / images.length,
-          day: today.setHours(0, 0, 0, 0),
+          day: today,
           theme: images[0].theme,
         });
       }
@@ -124,65 +103,6 @@ export const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
     }, 750);
 
     return isCorrectChoice;
-  };
-
-  const answers = images.map((image, index) => {
-    const generatedText = image.real ? 'real' : 'AI';
-    const userChoseCorrectly = choiceKeeper[index];
-    const feedbackIcon = userChoseCorrectly ? (
-      <CheckOutlined className='text-6xl text-green-600 absolute bottom-6 right-6 z-10' />
-    ) : (
-      <CloseOutlined className='text-6xl text-red-600 absolute bottom-6 right-6 z-10' />
-    );
-
-    return (
-      <div className='p-8' key={image.url}>
-        <div className='flex justify-center '>
-          <div className='relative p-4'>
-            <img
-              className={
-                'rounded-lg border-solid border-2 z-0 ' +
-                (userChoseCorrectly ? 'border-green-500' : 'border-red-500')
-              }
-              style={{ maxWidth: '100%' }}
-              src={`data:image/png;base64,${image.data}`}
-            />
-            {feedbackIcon}
-          </div>
-        </div>
-        <p className='text-2xl'>This photo is {generatedText}</p>
-      </div>
-    );
-  });
-
-  const share = async () => {
-    const completeScoreText = cookies.get('last_complete_score_text');
-    const isMobile = () => {
-      const regex =
-        /Mobi|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
-      return regex.test(navigator.userAgent);
-    };
-    if (shareButton.current) {
-      try {
-        if (isMobile()) {
-          const shareData = {
-            title: 'Imaginate',
-            text: completeScoreText,
-            url: 'https://playimaginate.com',
-          };
-          await navigator.share(shareData);
-          shareButton.current.innerHTML = '🎉 Score shared!';
-        } else {
-          await navigator.clipboard.writeText(completeScoreText);
-          shareButton.current.innerHTML = '🎉 Score copied!';
-        }
-        posthog.capture('score_shared');
-      } catch (err) {
-        if (err instanceof DOMException && err.name !== 'AbortError') {
-          shareButton.current.innerHTML = 'Something went wrong...';
-        }
-      }
-    }
   };
 
   useEffect(() => {
@@ -268,38 +188,7 @@ export const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
               setIsModalOpen(false);
             }}
           >
-            <Flex
-              justify='center'
-              align='center'
-              gap={'1rem'}
-              className='text-center'
-              vertical
-            >
-              <p className='text-2xl'>
-                You got {score} out of {images.length} correct!
-              </p>
-              <Carousel
-                arrows
-                dotPosition='left'
-                infinite={false}
-                className='flex gap-4'
-                style={{ width: '100%' }}
-              >
-                {answers}
-              </Carousel>
-              <div className='p-1 m-8 share-button-border rounded-full'>
-                <Button
-                  className='p-8 text-xl rounded-full '
-                  ref={shareButton}
-                  type='default'
-                  key='shareButton'
-                  onClick={() => share()}
-                >
-                  <CopyOutlined className='mr-2' />
-                  Share score
-                </Button>
-              </div>
-            </Flex>
+            <GameRecap choices={choiceKeeper} />
           </Modal>
         </div>
         <Tour
@@ -311,3 +200,5 @@ export const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
     </div>
   );
 };
+
+export default PhotoQueue;

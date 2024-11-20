@@ -1,4 +1,4 @@
-export interface Image {
+export type Image = {
   data: string;
   date: string;
   filename: string;
@@ -6,4 +6,9 @@ export interface Image {
   status: 'verified';
   theme: string;
   url: string;
-}
+};
+
+export type Choice = {
+  isCorrect: boolean;
+  image: Image;
+};
