@@ -9,6 +9,7 @@ import { getImages } from './services/Image.service.ts';
 import { Choice, Image } from './types/Image.types.ts';
 import { calculateDay } from './services/Day.service.ts';
 import { generateScoreHTML } from './services/Score.service.tsx';
+import AuthProvider from './providers/AuthProvider.tsx';
 
 const day = calculateDay();
 
@@ -27,7 +28,6 @@ function App() {
       }
     });
   }, []);
-
 
   useEffect(() => {
     const storedDayLastPlayed = Number(localStorage.getItem('day_last_played'));
@@ -58,58 +58,60 @@ function App() {
           algorithm: darkAlgorithm,
         }}
       >
-        <Flex
-          style={{ width: '100vw', maxWidth: '1024px' }}
-          align='center'
-          justify='space-between'
-          className='h-full w-full '
-          vertical
-        >
-          <NavBar theme={imageTheme} />
+        <AuthProvider>
           <Flex
+            style={{ width: '100vw', maxWidth: '1024px' }}
             align='center'
-            justify='space-evenly'
-            className='flex-auto w-full'
+            justify='space-between'
+            className='h-full w-full '
             vertical
           >
-            {showApp ? <PhotoQueue images={images} /> : dailyGameReminder}
-          </Flex>
-          <div className='text-center m-8'>
-            <p>
-              Made by{' '}
-              <a
-                href='https://faisal-fawad.github.io'
-                onClick={() => posthog.capture('faisal_link_click')}
-                target='_blank'
-              >
-                Faisal
-              </a>
-              ,{' '}
-              <a
-                href='https://nathanprobert.ca'
-                onClick={() => posthog.capture('nate_link_click')}
-                target='_blank'
-              >
-                Nate
-              </a>
-              , and{' '}
-              <a
-                href='https://zachlegesse.ca'
-                onClick={() => posthog.capture('zach_link_click')}
-                target='_blank'
-              >
-                Zach
-              </a>
-            </p>
-            <a
-              className='text-slate-500'
-              href='https://pexels.com'
-              target='_blank'
+            <NavBar theme={imageTheme} />
+            <Flex
+              align='center'
+              justify='space-evenly'
+              className='flex-auto w-full'
+              vertical
             >
-              Real photos sourced at Pexels.com
-            </a>
-          </div>
-        </Flex>
+              {showApp ? <PhotoQueue images={images} /> : dailyGameReminder}
+            </Flex>
+            <div className='text-center m-8'>
+              <p>
+                Made by{' '}
+                <a
+                  href='https://faisal-fawad.github.io'
+                  onClick={() => posthog.capture('faisal_link_click')}
+                  target='_blank'
+                >
+                  Faisal
+                </a>
+                ,{' '}
+                <a
+                  href='https://nathanprobert.ca'
+                  onClick={() => posthog.capture('nate_link_click')}
+                  target='_blank'
+                >
+                  Nate
+                </a>
+                , and{' '}
+                <a
+                  href='https://zachlegesse.ca'
+                  onClick={() => posthog.capture('zach_link_click')}
+                  target='_blank'
+                >
+                  Zach
+                </a>
+              </p>
+              <a
+                className='text-slate-500'
+                href='https://pexels.com'
+                target='_blank'
+              >
+                Real photos sourced at Pexels.com
+              </a>
+            </div>
+          </Flex>
+        </AuthProvider>
       </ConfigProvider>
     </div>
   );
