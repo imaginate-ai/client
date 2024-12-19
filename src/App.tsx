@@ -70,14 +70,6 @@ function App() {
           vertical
         >
           <Navbar theme={imageTheme} />
-          <Alert
-            message="WE ARE BEING IMPERSONATED ON TWITTER"
-            description="Twitter user @imaginate_ai is using our name and branding to support a crypto scam. Do not invest."
-            type="error"
-            showIcon
-            closable
-          />
-
           <Flex
             align="center"
             justify="space-evenly"
@@ -94,7 +86,7 @@ function App() {
             <p>
               Follow us on{" "}
               <a
-                href="https://bsky.app/profile/playimaginate.bsky.social"
+                href="https://bsky.app/profile/playimaginate.com"
                 onClick={() => posthog.capture("bluesky_link_click")}
               >
                 bluesky
