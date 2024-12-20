@@ -1,7 +1,7 @@
 import { ReactElement, useEffect, useRef, useState } from "react";
 import "./App.css";
 import Navbar from "./navigation/Navbar";
-import { Alert, ConfigProvider, Divider, Flex, theme } from "antd";
+import { ConfigProvider, Divider, Flex, theme } from "antd";
 
 import posthog from "posthog-js";
 import Cookies from "universal-cookie";
