@@ -11,7 +11,7 @@ import loadingGif from "../../assets/loading.gif";
 import posthog from "posthog-js";
 import GameRecap from "../GameRecap/GameRecap.tsx";
 import { Choice } from "../../types/Image.types.ts";
-import { useGameOverContext } from "../../providers/gameState.provider.tsx";
+import { useGameOverContext } from "../../providers/gameOver.provider.tsx";
 
 const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
   const [score, setScore] = useState(0);

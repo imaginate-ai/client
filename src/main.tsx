@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 import posthog from "posthog-js";
-import { GameOverProvider } from "./providers/gameState.provider.tsx";
+import { GameOverProvider } from "./providers/gameOver.provider.tsx";
 
 posthog.init("phc_TrQqpxDjEZAOLzSUBk8DKJF8UzhBj4sbkhe6YOSxYxe", {
   api_host: "https://us.i.posthog.com",

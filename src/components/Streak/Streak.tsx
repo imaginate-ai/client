@@ -2,7 +2,7 @@ import { Flex } from "antd";
 import { FireOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { calculateDayFromDate, currentDay } from "../../services/Day.service";
-import { useGameOverContext } from "../../providers/gameState.provider";
+import { useGameOverContext } from "../../providers/gameOver.provider";
 
 const StreakWidget = () => {
   const [streak, playedToday] = UseStreak();
