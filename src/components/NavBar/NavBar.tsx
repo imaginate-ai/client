@@ -1,9 +1,9 @@
-import { Divider, Flex, Tooltip } from 'antd';
-import { InfoCircleOutlined } from '@ant-design/icons';
-import logo from '../../assets/imaginate-logo.png';
-import './NavBar.css';
-
-const THEME_EXPLAINER_TEXT = 'The theme changes every day!';
+import { Divider, Flex } from "antd";
+import logo from "../../assets/imaginate-logo.png";
+import mobileLogo from "../../assets/imaginate-beaker.png";
+import "./NavBar.css";
+import StreakWidget from "../Streak/Streak";
+import ThemeWidget from "../Theme/Theme";
 
 type NavBarProps = {
   theme: string | undefined;
@@ -11,22 +11,15 @@ type NavBarProps = {
 
 const NavBar = ({ theme }: NavBarProps) => {
   return (
-    <div className='w-full'>
-      <Flex align='flex-end' justify='space-between' wrap>
-        <img className='h-10 mx-4 mt-6' src={logo} />
-        <div className='mx-4 mt-4'>
-          <Tooltip title={THEME_EXPLAINER_TEXT} placement='bottomLeft'>
-            {theme ? (
-              <Flex>
-                <InfoCircleOutlined className='mr-1' />
-                <p className='mr-2'>Theme:</p>
-                <p>{theme}</p>
-              </Flex>
-            ) : (
-              ''
-            )}
-          </Tooltip>
-        </div>
+    <div className="w-full p-4">
+      <Flex align="center" justify="space-between" wrap>
+        {window.innerWidth < 480
+          ? <img className="h-10" src={mobileLogo} />
+          : <img className="h-10" src={logo} />}
+        <Flex align="flex-end" justify="space-between" gap="16px">
+          {theme ? <ThemeWidget theme={theme} /> : null}
+          <StreakWidget />
+        </Flex>
       </Flex>
       <Divider />
     </div>
