@@ -1,16 +1,16 @@
-import { useState, useRef, ReactElement, useEffect } from 'react';
-import './App.css';
-import NavBar from './components/NavBar/NavBar.tsx';
-import { ConfigProvider, theme, Flex } from 'antd';
+import { ReactElement, useEffect, useRef, useState } from "react";
+import "./App.css";
+import { ConfigProvider, Divider, Flex, theme } from "antd";
 
-import posthog from 'posthog-js';
-import PhotoQueue from './components/PhotoQueue/PhotoQueue.tsx';
-import { getImages } from './services/Image.service.ts';
-import { Choice, Image } from './types/Image.types.ts';
-import { calculateDay } from './services/Day.service.ts';
-import { generateScoreHTML } from './services/Score.service.tsx';
+import posthog from "posthog-js";
+import PhotoQueue from "./components/PhotoQueue/PhotoQueue.tsx";
+import { getImages } from "./services/Image.service.ts";
+import { Choice, Image } from "./types/Image.types.ts";
+import { currentDay } from "./services/Day.service.ts";
+import { generateScoreHTML } from "./services/Score.service.tsx";
+import NavBar from "./components/NavBar/NavBar.tsx";
 
-const day = calculateDay();
+const day = currentDay();
 
 function App() {
   const { darkAlgorithm } = theme;
@@ -28,10 +28,9 @@ function App() {
     });
   }, []);
 
-
   useEffect(() => {
-    const storedDayLastPlayed = Number(localStorage.getItem('day_last_played'));
-    const storedLastChoiceKeeper = localStorage.getItem('last_choice_keeper');
+    const storedDayLastPlayed = Number(localStorage.getItem("day_last_played"));
+    const storedLastChoiceKeeper = localStorage.getItem("last_choice_keeper");
     if (storedDayLastPlayed && storedLastChoiceKeeper) {
       const today = new Date().setHours(0, 0, 0, 0);
       const dayLastPlayed = new Date(storedDayLastPlayed).setHours(0, 0, 0, 0);
@@ -44,9 +43,9 @@ function App() {
   }, []);
 
   const dailyGameReminder = (
-    <div className='text-center'>
-      <p className='font-semibold mb-2'>You already played today!</p>
-      <p className='font-semibold mb-2'>See you again tomorrow :)</p>
+    <div className="text-center">
+      <p className="font-semibold mb-2">You already played today!</p>
+      <p className="font-semibold mb-2">See you again tomorrow :)</p>
       {scoreText.current}
     </div>
   );
