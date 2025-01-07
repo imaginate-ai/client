@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState } from 'react';
 
 type GameOverContextType = [
   boolean,
@@ -9,7 +9,11 @@ export const GameOverContext = createContext<GameOverContextType>(
   [] as unknown as GameOverContextType,
 );
 
-export const GameOverProvider = ({ children }) => {
+export const GameOverProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const useStateValue = useState(false);
   return (
     <GameOverContext.Provider value={useStateValue}>
