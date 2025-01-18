@@ -29,13 +29,13 @@ const PhotoCarousel = ({ choices }: PhotoCarouselProps) => {
     exitBeforeEnter: true,
   });
 
-  const selectNewPhotoIndex = (newIndex: number) => {
+  const onSelectNewPhotoIndex = (newIndex: number) => {
     setIsButtonClicked(true);
     setAnimationOffset((newIndex - photoIndex) * 20);
     setPhotoIndex(newIndex);
   };
 
-  const intervalRef = useRef<any>(null); //bad
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (isButtonClicked) {
@@ -61,9 +61,9 @@ const PhotoCarousel = ({ choices }: PhotoCarouselProps) => {
     const generatedText = image.real ? 'real' : 'AI';
     const feedbackIconClasses = 'text-6xl absolute bottom-6 right-6 z-10';
     const feedbackIcon = correct ? (
-      <CheckOutlined className={feedbackIconClasses + 'text-green-600'} />
+      <CheckOutlined className={feedbackIconClasses + ' text-green-600'} />
     ) : (
-      <CloseOutlined className={feedbackIconClasses + 'text-red-600'} />
+      <CloseOutlined className={feedbackIconClasses + ' text-red-600'} />
     );
     return (
       <div className='p-8' key={image.url}>
@@ -89,7 +89,7 @@ const PhotoCarousel = ({ choices }: PhotoCarouselProps) => {
       <div className='max-w-lg w-full'>
         <PhotoSelector
           choices={choices}
-          clickHandler={selectNewPhotoIndex}
+          clickHandler={onSelectNewPhotoIndex}
           selectedIndex={photoIndex}
         />
       </div>
