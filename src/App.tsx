@@ -1,4 +1,4 @@
-import { ReactElement, useEffect, useRef, useState } from 'react';
+import { ReactElement, useContext, useEffect, useRef, useState } from 'react';
 import './App.css';
 import { ConfigProvider, Divider, Flex, theme } from 'antd';
 
@@ -10,6 +10,8 @@ import { currentDay } from './services/Day.service.ts';
 import { generateScoreHTML } from './services/Score.service.tsx';
 import NavBar from './components/NavBar/NavBar.tsx';
 import GameRecap from './components/GameRecap/GameRecap.tsx';
+import { GameOverContext } from './providers/gameOver.provider.tsx';
+import { useTransition, animated } from '@react-spring/web';
 
 const day = currentDay();
 
@@ -19,6 +21,7 @@ function App() {
   const scoreText = useRef<ReactElement>();
   const [images, setImages] = useState<Image[]>([]);
   const [imageTheme, setImageTheme] = useState('');
+  const [isGameOver, _setIsGameOver] = useContext(GameOverContext);
 
   useEffect(() => {
     getImages().then((response: Image[] | undefined) => {
@@ -43,6 +46,22 @@ function App() {
     }
   }, []);
 
+  const showRecap = !showApp || isGameOver;
+
+  const transitions = useTransition(showRecap, {
+    from: {
+      opacity: 0,
+      transform: `translateY(20px)`,
+    },
+    enter: { opacity: 1, transform: `translateY(0px)` },
+    leave: { opacity: 0, transform: `translateY(20px)` },
+    config: {
+      duration: 200,
+      easing: (t) => Math.pow(t, 3),
+    },
+    exitBeforeEnter: true,
+  });
+
   return (
     <div className='h-full max-h-svh'>
       <ConfigProvider
@@ -64,19 +83,15 @@ function App() {
             className='flex-auto w-full'
             vertical
           >
-            {showApp ? <PhotoQueue images={images} /> : <GameRecap />}
+            {transitions((style, showRecap) => {
+              return (
+                <animated.div className='w-full' style={style}>
+                  {showRecap ? <GameRecap /> : <PhotoQueue images={images} />}
+                </animated.div>
+              );
+            })}
           </Flex>
           <Flex className='text-center m-8' align='center' justify='center'>
-            <p>
-              Follow us on{' '}
-              <a
-                href='https://bsky.app/profile/playimaginate.com'
-                onClick={() => posthog.capture('bluesky_link_click')}
-              >
-                bluesky
-              </a>
-            </p>
-            <Divider type='vertical' />
             <p>
               Made by{' '}
               <a
