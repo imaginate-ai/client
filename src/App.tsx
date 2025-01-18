@@ -6,22 +6,29 @@ import posthog from 'posthog-js';
 import PhotoQueue from './components/PhotoQueue/PhotoQueue.tsx';
 import { getImages } from './services/Image.service.ts';
 import { Choice, Image } from './types/Image.types.ts';
-import { currentDay } from './services/Day.service.ts';
+import { getDayLastPlayed, getToday } from './services/Day.service.ts';
 import { generateScoreHTML } from './services/Score.service.tsx';
 import NavBar from './components/NavBar/NavBar.tsx';
 import GameRecap from './components/GameRecap/GameRecap.tsx';
 import { GameOverContext } from './providers/gameOver.provider.tsx';
 import { useTransition, animated } from '@react-spring/web';
+import { getLastChoiceKeeper } from './services/Choices.service.ts';
 
-const day = currentDay();
+const day = getToday();
 
 function App() {
   const { darkAlgorithm } = theme;
-  const [showApp, setShowApp] = useState(true);
+  const [showGame, setShowGame] = useState<null | boolean>(null);
   const scoreText = useRef<ReactElement>();
   const [images, setImages] = useState<Image[]>([]);
   const [imageTheme, setImageTheme] = useState('');
   const [isGameOver, _setIsGameOver] = useContext(GameOverContext);
+
+  useEffect(() => {
+    if (isGameOver) {
+      setShowGame(!isGameOver);
+    }
+  }, [isGameOver]);
 
   useEffect(() => {
     getImages().then((response: Image[] | undefined) => {
@@ -33,22 +40,21 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const storedDayLastPlayed = Number(localStorage.getItem('day_last_played'));
-    const storedLastChoiceKeeper = localStorage.getItem('last_choice_keeper');
-    if (storedDayLastPlayed && storedLastChoiceKeeper) {
-      const today = new Date().setHours(0, 0, 0, 0);
-      const dayLastPlayed = new Date(storedDayLastPlayed).setHours(0, 0, 0, 0);
-      const lastChoiceKeeper: Choice[] = JSON.parse(storedLastChoiceKeeper);
-      if (dayLastPlayed === today) {
-        setShowApp(false);
-        scoreText.current = generateScoreHTML(lastChoiceKeeper, day);
-      }
+    const today: number = getToday();
+    const dayLastPlayed: number = getDayLastPlayed();
+    const lastChoiceKeeper: Choice[] = getLastChoiceKeeper();
+
+    const hasPlayedToday =
+      lastChoiceKeeper.length > 0 && dayLastPlayed === today;
+
+    if (hasPlayedToday) {
+      scoreText.current = generateScoreHTML(lastChoiceKeeper, day);
     }
+
+    setShowGame(!hasPlayedToday);
   }, []);
 
-  const showRecap = !showApp || isGameOver;
-
-  const transitions = useTransition(showRecap, {
+  const transitions = useTransition(showGame, {
     from: {
       opacity: 0,
       transform: `translateY(20px)`,
@@ -83,10 +89,15 @@ function App() {
             className='flex-auto w-full'
             vertical
           >
-            {transitions((style, showRecap) => {
+            {transitions((style, showGameView) => {
               return (
                 <animated.div className='w-full' style={style}>
-                  {showRecap ? <GameRecap /> : <PhotoQueue images={images} />}
+                  {showGameView !== null &&
+                    (showGameView ? (
+                      <PhotoQueue images={images} />
+                    ) : (
+                      <GameRecap />
+                    ))}
                 </animated.div>
               );
             })}
