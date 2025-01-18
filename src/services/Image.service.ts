@@ -1,5 +1,5 @@
 import { Image } from '../types/Image.types.ts';
-import { currentDay } from './Day.service.ts';
+import { getToday } from './Day.service.ts';
 
 export const getImages = (() => {
   let cachedImages: Promise<Image[]>;
@@ -8,7 +8,7 @@ export const getImages = (() => {
     if (cachedImages) {
       return cachedImages;
     }
-    const day = currentDay();
+    const day = getToday();
     try {
       const imageResponse = await fetch(
         `${import.meta.env.VITE_API_URL}/date/${day}/images`,
