@@ -1,10 +1,10 @@
-import { Flex } from "antd";
-import { Choice } from "../../types/Image.types";
-import PhotoCarousel from "../PhotoCarousel/PhotoCarousel";
-import ShareButton from "../ShareButton/ShareButton";
-import { useMemo } from "react";
-import { currentDay } from "../../services/Day.service";
-import { generateScoreText } from "../../services/Score.service";
+import { Card, Flex } from 'antd';
+import { Choice } from '../../types/Image.types';
+import PhotoCarousel from '../PhotoCarousel/PhotoCarousel';
+import ShareButton from '../ShareButton/ShareButton';
+import { useEffect, useMemo, useState } from 'react';
+import { currentDay } from '../../services/Day.service';
+import { generateScoreText } from '../../services/Score.service';
 
 type GameRecapProps = {
   choices: Choice[];
@@ -12,21 +12,22 @@ type GameRecapProps = {
 
 const day = currentDay();
 
-const GameRecap = ({ choices }: GameRecapProps) => {
+const GameRecap = () => {
+  const choices = useChoiceKeeper();
   const score = useMemo(() => {
     return choices.filter((choice) => choice.isCorrect).length;
   }, [choices]);
   const scoreText = useMemo(() => generateScoreText(choices, day), [choices]);
   return (
-    <div className="w-full">
+    <div className='w-full h-full'>
       <Flex
-        justify="center"
-        align="center"
-        gap={"1rem"}
-        className="text-center"
+        justify='center'
+        align='center'
+        gap={'1rem'}
+        className='text-center'
         vertical
       >
-        <p className="text-2xl">
+        <p className='text-2xl'>
           You got {score} out of {choices.length} correct!
         </p>
         <PhotoCarousel choices={choices} />
@@ -34,6 +35,19 @@ const GameRecap = ({ choices }: GameRecapProps) => {
       </Flex>
     </div>
   );
+};
+
+const useChoiceKeeper = () => {
+  const [choiceKeeper, setChoiceKeeper] = useState<Choice[]>([]);
+
+  useEffect(() => {
+    const savedChoices = localStorage.getItem('last_choice_keeper');
+    if (savedChoices) {
+      setChoiceKeeper(JSON.parse(savedChoices));
+    }
+  }, []);
+
+  return choiceKeeper;
 };
 
 export default GameRecap;
