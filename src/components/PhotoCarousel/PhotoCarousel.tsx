@@ -59,11 +59,12 @@ const PhotoCarousel = ({ choices }: PhotoCarouselProps) => {
 
   const photos = choices.map(({ isCorrect: correct, image }) => {
     const generatedText = image.real ? 'real' : 'AI';
-    // const feedbackIcon = correct ? (
-    //   <CheckOutlined className='text-6xl text-green-600 absolute bottom-6 right-6 z-10' />
-    // ) : (
-    //   <CloseOutlined className='text-6xl text-red-600 absolute bottom-6 right-6 z-10' />
-    // );
+    const feedbackIconClasses = 'text-6xl absolute bottom-6 right-6 z-10';
+    const feedbackIcon = correct ? (
+      <CheckOutlined className={feedbackIconClasses + 'text-green-600'} />
+    ) : (
+      <CloseOutlined className={feedbackIconClasses + 'text-red-600'} />
+    );
     return (
       <div className='p-8' key={image.url}>
         <div className='flex justify-center'>
@@ -72,6 +73,7 @@ const PhotoCarousel = ({ choices }: PhotoCarouselProps) => {
               className='rounded-lg'
               src={`data:image/png;base64,${image.data}`}
             />
+            {feedbackIcon}
           </div>
         </div>
         <p className='text-2xl'>This photo is {generatedText}</p>
