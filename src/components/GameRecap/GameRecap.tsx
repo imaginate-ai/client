@@ -30,7 +30,9 @@ const GameRecap = () => {
         <p className='text-2xl'>
           You got {score} out of {choices.length} correct!
         </p>
-        <PhotoCarousel choices={choices} />
+        <div className='w-11/12'>
+          <PhotoCarousel choices={choices} />
+        </div>
         <ShareButton scoreText={scoreText} />
       </Flex>
     </div>
