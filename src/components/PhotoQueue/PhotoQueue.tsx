@@ -1,11 +1,7 @@
 import { JSX, ReactElement, useEffect, useRef, useState } from 'react';
 import { PhotoQueueProps } from './PhotoQueue.types.ts';
-import { Flex, FloatButton, Progress, Tour, TourProps } from 'antd';
-import {
-  CheckOutlined,
-  CloseOutlined,
-  QuestionCircleOutlined,
-} from '@ant-design/icons';
+import { Flex, Progress, Tour, TourProps } from 'antd';
+import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import PhotoQueueButtons from './PhotoQueueButtons.tsx';
 import loadingGif from '../../assets/loading.gif';
 import posthog from 'posthog-js';
@@ -15,7 +11,6 @@ import { useGameOverContext } from '../../providers/gameOver.provider.tsx';
 const PhotoQueue = ({ images }: PhotoQueueProps): JSX.Element => {
   const [score, setScore] = useState(0);
   const [index, setIndex] = useState(0);
-  const [setIsModalOpen] = useState(false);
   const [choiceKeeper, setChoiceKeeper] = useState<Array<Choice>>([]);
   const [disableButtons, setDisableButtons] = useState(true);
   const image = useRef<HTMLImageElement>(null);

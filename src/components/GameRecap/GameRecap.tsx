@@ -1,4 +1,4 @@
-import { Card, Flex } from 'antd';
+import { Flex } from 'antd';
 import { Choice } from '../../types/Image.types';
 import PhotoCarousel from '../PhotoCarousel/PhotoCarousel';
 import ShareButton from '../ShareButton/ShareButton';
@@ -7,10 +7,6 @@ import { currentDay } from '../../services/Day.service';
 import { generateScoreText } from '../../services/Score.service';
 import { useSpring, animated } from '@react-spring/web';
 import ConfettiExplosion from 'react-confetti-explosion';
-
-type GameRecapProps = {
-  choices: Choice[];
-};
 
 const day = currentDay();
 const animationTime = 500;

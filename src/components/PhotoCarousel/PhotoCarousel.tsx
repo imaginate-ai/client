@@ -1,7 +1,7 @@
 import { Choice } from '../../types/Image.types';
 import { CloseOutlined, CheckOutlined } from '@ant-design/icons';
 import { useEffect, useRef, useState } from 'react';
-import { useTransition, animated, useSpring } from '@react-spring/web';
+import { useTransition, animated } from '@react-spring/web';
 import PhotoSelector from './PhotoSelector';
 import { Flex } from 'antd';
 
