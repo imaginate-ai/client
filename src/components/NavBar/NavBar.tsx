@@ -11,7 +11,7 @@ type NavBarProps = {
 
 const NavBar = ({ theme }: NavBarProps) => {
   return (
-    <div className="w-full p-4">
+    <div className="w-full px-4 pt-4">
       <Flex align="center" justify="space-between" wrap>
         {window.innerWidth < 480
           ? <img className="h-10" src={mobileLogo} />

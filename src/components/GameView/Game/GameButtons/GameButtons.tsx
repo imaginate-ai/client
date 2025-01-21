@@ -1,11 +1,15 @@
-import { JSX, useEffect, useRef, useState } from 'react';
-import { PhotoQueueButtonProps } from './PhotoQueue.types';
-import { Button } from 'antd';
+import { JSX, useEffect, useRef, useState } from "react";
+import { Button } from "antd";
 
-const PhotoQueueButtons = ({
+type GameButtonProps = {
+  disabled: boolean;
+  makeChoice: Function;
+};
+
+const GameButtons = ({
   makeChoice,
   disabled,
-}: PhotoQueueButtonProps): JSX.Element => {
+}: GameButtonProps): JSX.Element => {
   const AiButton = useRef<HTMLButtonElement>(null);
   const RealButton = useRef<HTMLButtonElement>(null);
   const [aiButtonDisabled, setAiButtonDisabled] = useState(true);
@@ -15,7 +19,7 @@ const PhotoQueueButtons = ({
     let choseReal: boolean;
     if (AiButton?.current && RealButton?.current) {
       buttonsDisabled(true);
-      if (target.textContent === 'A.I.') {
+      if (target.textContent === "A.I.") {
         choseReal = false;
       } else {
         choseReal = true;
@@ -42,11 +46,11 @@ const PhotoQueueButtons = ({
   }, [disabled]);
 
   return (
-    <div className='flex flex-row gap-8 h-16'>
+    <div className="flex flex-row gap-8 h-16">
       <Button
         ref={AiButton}
-        type='primary'
-        className={'choiceButton mb-2 w-full h-full text-body'}
+        type="primary"
+        className={"choiceButton mb-2 w-full h-full text-body"}
         disabled={aiButtonDisabled}
         onClick={(event) => clickHandler(event.target as HTMLElement)}
       >
@@ -54,8 +58,8 @@ const PhotoQueueButtons = ({
       </Button>
       <Button
         ref={RealButton}
-        type='primary'
-        className={'choiceButton mb-2 w-full h-full text-body'}
+        type="primary"
+        className={"choiceButton mb-2 w-full h-full text-body"}
         disabled={realButtonDisabled}
         onClick={(event) => clickHandler(event.target as HTMLElement)}
       >
@@ -65,4 +69,4 @@ const PhotoQueueButtons = ({
   );
 };
 
-export default PhotoQueueButtons;
+export default GameButtons;
