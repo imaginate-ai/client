@@ -71,9 +71,12 @@ const PhotoCarousel = ({ choices }: PhotoCarouselProps) => {
         className="w-full h-full"
         key={image.url}
       >
-        <div className="relative p-4">
+        <div
+          style={{ maxHeight: "40svh" }}
+          className="relative flex-auto aspect-square m-4 rounded-lg rounded-lg overflow-hidden"
+        >
           <img
-            className="rounded-lg aspect-square max-h-100"
+            className=" object-contain w-full h-full"
             src={`data:image/png;base64,${image.data}`}
           />
           {feedbackIcon}
@@ -85,18 +88,16 @@ const PhotoCarousel = ({ choices }: PhotoCarouselProps) => {
 
   return (
     <Flex justify="center" align="center" className="w-full h-full" vertical>
-      <div className="flex-auto" style={{ maxHeight: "100%" }}>
-        {transitions((style, item) => {
-          return (
-            <animated.div
-              className={"w-full h-full"}
-              style={style}
-            >
-              {photos[item]}
-            </animated.div>
-          );
-        })}
-      </div>
+      {transitions((style, item) => {
+        return (
+          <animated.div
+            className={"w-full h-full"}
+            style={style}
+          >
+            {photos[item]}
+          </animated.div>
+        );
+      })}
       <div className="max-w-lg mt-4">
         <PhotoSelector
           choices={choices}

@@ -94,10 +94,11 @@ const Game = ({ photos }: GameProps): JSX.Element => {
       align="center"
       justify="center"
       className="w-full h-full"
+      style={{}}
     >
       <div
         ref={parentBox}
-        className="w-11/12 flex-1"
+        className={"w-11/12"}
         style={{ maxWidth: "512px" }}
       >
         <Progress
@@ -107,34 +108,44 @@ const Game = ({ photos }: GameProps): JSX.Element => {
             : 0}
           showInfo={false}
         />
-        <div
-          className="relative rounded-lg overflow-hidden mb-8 w-full"
-          style={{ backgroundColor: undefined }}
+        <Flex
+          align="center"
+          justify="center"
+          className="w-full h-full"
         >
-          {photos?.length
-            ? (
-              <img
-                ref={image}
-                src={`data:image/png;base64,${photos[index].data}`}
-              />
-            )
-            : (
-              <div className="rounded-xl bg-zinc-900 aspect-square w-full">
-                <Flex
-                  align="center"
-                  justify="center"
-                  vertical
-                  className="w-full h-full -mt-8"
-                >
-                  <img width="192px" src={loadingGif} />
-                  <p className="text-center">Loading images...</p>
-                </Flex>
-              </div>
-            )}
-          <div className="opacity-75 absolute w-full h-full">
-            {feedbackOverlay}
+          <div
+            className="relative rounded-xl overflow-hidden mb-8 h-full aspect-square"
+            style={{
+              maxHeight: "min(512px,60svh)",
+              backgroundColor: undefined,
+            }}
+          >
+            {photos?.length
+              ? (
+                <img
+                  className="h-full"
+                  ref={image}
+                  src={`data:image/png;base64,${photos[index].data}`}
+                />
+              )
+              : (
+                <div className="bg-zinc-900 aspect-square w-full">
+                  <Flex
+                    align="center"
+                    justify="center"
+                    vertical
+                    className="w-full h-full -mt-8"
+                  >
+                    <img width="192px" src={loadingGif} />
+                    <p className="text-center">Loading images...</p>
+                  </Flex>
+                </div>
+              )}
+            <div className="opacity-75 absolute w-full h-full z-10 top-0">
+              {feedbackOverlay}
+            </div>
           </div>
-        </div>
+        </Flex>
         <GameButtons
           makeChoice={makeChoice}
           disabled={disableButtons}

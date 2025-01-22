@@ -20,7 +20,7 @@ const GameRecap = () => {
   return (
     <animated.div style={animations} className="w-full h-full">
       <Flex
-        justify="space-between"
+        justify="center"
         align="center"
         className="text-center w-full h-full"
         vertical

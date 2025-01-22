@@ -24,7 +24,7 @@ const GameView = () => {
     >
       {transitions((style, shouldDisplayGame) => {
         return (
-          <animated.div className="h-full w-11/12" style={style}>
+          <animated.div className="h-full w-full" style={style}>
             {shouldDisplayGame !== null &&
               (shouldDisplayGame ? <Game photos={photos} /> : <GameRecap />)}
           </animated.div>
