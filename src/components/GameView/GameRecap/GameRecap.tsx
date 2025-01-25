@@ -27,7 +27,7 @@ const GameRecap = () => {
       >
         <GameRecapText choices={choices} />
         <PhotoCarousel choices={choices} />
-        <div className="my-8">
+        <div className="mt-8 mb-16">
           <ShareButton scoreText={scoreText} />
         </div>
       </Flex>

@@ -16,21 +16,23 @@ const GameView = () => {
   const transitions = useGameViewTransitions(showGame);
 
   return (
-    <Flex
-      align="center"
-      justify="center"
-      vertical
-      className="w-full h-full"
-    >
+    <>
       {transitions((style, shouldDisplayGame) => {
         return (
-          <animated.div className="h-full w-full" style={style}>
-            {shouldDisplayGame !== null &&
-              (shouldDisplayGame ? <Game photos={photos} /> : <GameRecap />)}
+          <animated.div className="h-full w-11/12" style={style}>
+            <Flex
+              align="center"
+              justify="center"
+              className="h-full "
+              vertical
+            >
+              {shouldDisplayGame !== null &&
+                (shouldDisplayGame ? <Game photos={photos} /> : <GameRecap />)}
+            </Flex>
           </animated.div>
         );
       })}
-    </Flex>
+    </>
   );
 };
 

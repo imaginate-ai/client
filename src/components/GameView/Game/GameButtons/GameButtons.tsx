@@ -46,7 +46,7 @@ const GameButtons = ({
   }, [disabled]);
 
   return (
-    <div className="flex flex-row gap-8 h-16">
+    <div className="flex flex-row gap-4 h-16">
       <Button
         ref={AiButton}
         type="primary"

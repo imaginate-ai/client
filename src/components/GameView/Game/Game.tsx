@@ -2,11 +2,11 @@ import { JSX, ReactElement, useEffect, useRef, useState } from "react";
 import { Flex, Progress } from "antd";
 import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import GameButtons from "./GameButtons/GameButtons.tsx";
-import loadingGif from "../../../assets/loading.gif";
 import posthog from "posthog-js";
 import { Choice } from "../../../types/Image.types.ts";
 import { useGameOverContext } from "../../../providers/gameOver.provider.tsx";
 import { Image } from "../../../types/Image.types";
+import GamePhotoView from "./GamePhotoView/GamePhotoView.tsx";
 
 type GameProps = {
   photos: Image[] | undefined;
@@ -18,7 +18,6 @@ const Game = ({ photos }: GameProps): JSX.Element => {
   const [index, setIndex] = useState(0);
   const [choiceKeeper, setChoiceKeeper] = useState<Array<Choice>>([]);
   const [disableButtons, setDisableButtons] = useState(true);
-  const image = useRef<HTMLImageElement>(null);
   const parentBox = useRef<HTMLDivElement>(null);
   const [feedbackOverlay, setFeedbackOverlay] = useState<ReactElement>();
   const [isGameOver, setGameOver] = useGameOverContext();
@@ -91,61 +90,25 @@ const Game = ({ photos }: GameProps): JSX.Element => {
 
   return (
     <Flex
+      ref={parentBox}
       align="center"
       justify="center"
       className="w-full h-full"
-      style={{}}
+      style={{ maxWidth: "512px" }}
+      vertical
     >
-      <div
-        ref={parentBox}
-        className={"w-11/12"}
-        style={{ maxWidth: "512px" }}
-      >
-        <Progress
-          size={[parentBox.current?.offsetWidth ?? 0, 10]}
-          percent={photos?.length
-            ? disableButtons ? 100 : (index / photos.length) * 100
-            : 0}
-          showInfo={false}
-        />
-        <Flex
-          align="center"
-          justify="center"
-          className="w-full h-full"
-        >
-          <div
-            className="relative rounded-xl overflow-hidden mb-8 h-full aspect-square"
-            style={{
-              maxHeight: "min(512px,60svh)",
-              backgroundColor: undefined,
-            }}
-          >
-            {photos?.length
-              ? (
-                <img
-                  className="h-full"
-                  ref={image}
-                  src={`data:image/png;base64,${photos[index].data}`}
-                />
-              )
-              : (
-                <div className="bg-zinc-900 aspect-square w-full">
-                  <Flex
-                    align="center"
-                    justify="center"
-                    vertical
-                    className="w-full h-full -mt-8"
-                  >
-                    <img width="192px" src={loadingGif} />
-                    <p className="text-center">Loading images...</p>
-                  </Flex>
-                </div>
-              )}
-            <div className="opacity-75 absolute w-full h-full z-10 top-0">
-              {feedbackOverlay}
-            </div>
-          </div>
-        </Flex>
+      <Progress
+        size={["100%", 10]}
+        percent={photos?.length
+          ? disableButtons ? 100 : (index / photos.length) * 100
+          : 0}
+        showInfo={false}
+      />
+      <GamePhotoView
+        photo={photos?.[index]}
+        feedbackOverlay={feedbackOverlay}
+      />
+      <div className="w-full mb-32 mt-4">
         <GameButtons
           makeChoice={makeChoice}
           disabled={disableButtons}
