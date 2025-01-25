@@ -1,14 +1,14 @@
 import { animated, useTransition } from "@react-spring/web";
 import { Flex } from "antd";
 import { ReactElement, useContext, useEffect, useRef, useState } from "react";
-import { GameOverContext } from "../../providers/gameOver.provider";
-import { getDayLastPlayed, getToday } from "../../services/Day.service";
-import { getLastChoiceKeeper } from "../../services/Choices.service";
-import { Choice } from "../../types/Image.types";
-import { generateScoreHTML } from "../../services/Score.service";
+import { GameOverContext } from "@providers/gameOver.provider";
+import { getDayLastPlayed, getToday } from "@services/Day.service";
+import { getLastChoiceKeeper } from "@services/Choices.service";
+import { Choice } from "@local-types/Image.types";
+import { generateScoreHTML } from "@services/Score.service";
 import Game from "./Game/Game";
 import GameRecap from "./GameRecap/GameRecap";
-import { usePhotos } from "../../hooks/photos.hook";
+import { usePhotos } from "@hooks/photos.hook";
 
 const GameView = () => {
   const [photos] = usePhotos();

@@ -23,10 +23,13 @@
     /* Paths */
     "baseUrl": ".",
     "paths": {
-      "@assets": ["src/assets/*"],
-      "@components": ["src/components/*"],
-      "@hooks": ["src/hooks/*"],
-      "@local-types": ["src/types/*"]
+      "@app/*": ["src/*"],
+      "@assets/*": ["src/assets/*"],
+      "@components/*": ["src/components/*"],
+      "@hooks/*": ["src/hooks/*"],
+      "@providers/*": ["src/providers/*"],
+      "@services/*": ["src/services/*"],
+      "@local-types/*": ["src/types/*"]
     }
   },
   "include": ["src"],

@@ -1,14 +1,14 @@
 import { Flex } from "antd";
-import { Choice } from "../../../types/Image.types";
+import { Choice } from "src/types/Image.types";
 import PhotoCarousel from "./PhotoCarousel/PhotoCarousel";
-import ShareButton from "../../ShareButton/ShareButton";
+import ShareButton from "@components/ShareButton/ShareButton";
 import { useEffect, useMemo, useState } from "react";
-import { getToday } from "../../../services/Day.service";
-import { generateScoreText } from "../../../services/Score.service";
+import { getToday } from "@services/Day.service";
+import { generateScoreText } from "@services/Score.service";
 import { animated, useSpring } from "@react-spring/web";
-import { recapAnimationTime } from "../../../constants/GameRecapConstants";
+import { recapAnimationTime } from "@app/constants/GameRecapConstants";
 import GameRecapText from "./GameRecapText";
-import { getLastChoiceKeeper } from "../../../services/Choices.service";
+import { getLastChoiceKeeper } from "@services/Choices.service";
 
 const day = getToday();
 
