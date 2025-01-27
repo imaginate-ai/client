@@ -1,14 +1,14 @@
-import { Flex } from 'antd';
-import { Choice } from '../../types/Image.types';
-import PhotoCarousel from '../PhotoCarousel/PhotoCarousel';
-import ShareButton from '../ShareButton/ShareButton';
-import { useEffect, useMemo, useState } from 'react';
-import { getToday } from '../../services/Day.service';
-import { generateScoreText } from '../../services/Score.service';
-import { useSpring, animated } from '@react-spring/web';
-import { recapAnimationTime } from '../../constants/GameRecapConstants';
-import GameRecapText from '../GameRecapText.tsx/GameRecapText';
-import { getLastChoiceKeeper } from '../../services/Choices.service';
+import { Flex } from "antd";
+import { Choice } from "src/types/Image.types";
+import PhotoCarousel from "./PhotoCarousel/PhotoCarousel";
+import ShareButton from "@components/ShareButton/ShareButton";
+import { useEffect, useMemo, useState } from "react";
+import { getToday } from "@services/Day.service";
+import { generateScoreText } from "@services/Score.service";
+import { animated, useSpring } from "@react-spring/web";
+import { recapAnimationTime } from "@app/constants/GameRecapConstants";
+import GameRecapText from "./GameRecapText";
+import { getLastChoiceKeeper } from "@services/Choices.service";
 
 const day = getToday();
 
@@ -18,19 +18,18 @@ const GameRecap = () => {
   const animations = useRecapAnimations();
 
   return (
-    <animated.div className='w-full h-full' style={animations}>
+    <animated.div style={animations} className="w-full h-full">
       <Flex
-        justify='center'
-        align='center'
-        gap={'1rem'}
-        className='text-center'
+        justify="center"
+        align="center"
+        className="text-center w-full h-full"
         vertical
       >
         <GameRecapText choices={choices} />
-        <div className='w-11/12'>
-          <PhotoCarousel choices={choices} />
+        <PhotoCarousel choices={choices} />
+        <div className="mt-8 mb-16">
+          <ShareButton scoreText={scoreText} />
         </div>
-        <ShareButton scoreText={scoreText} />
       </Flex>
     </animated.div>
   );

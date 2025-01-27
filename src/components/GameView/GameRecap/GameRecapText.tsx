@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Choice } from '../../types/Image.types';
-import { recapAnimationTime } from '../../constants/GameRecapConstants';
-import ConfettiExplosion from 'react-confetti-explosion';
+import { useEffect, useMemo, useState } from "react";
+import { Choice } from "../../../types/Image.types";
+import { recapAnimationTime } from "../../../constants/GameRecapConstants";
+import ConfettiExplosion from "react-confetti-explosion";
 
 const GameRecapText = ({ choices }: { choices: Choice[] }) => {
   const [showConfetti, setShowConfetti] = useState(false);
@@ -19,9 +19,9 @@ const GameRecapText = ({ choices }: { choices: Choice[] }) => {
   }, [score, choices]);
 
   return (
-    <div className='relative'>
+    <div className="relative">
       {showConfetti && (
-        <div className='absolute top-0 left-1/2 transform -translate-x-1/2 z-50'>
+        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 z-50">
           <ConfettiExplosion
             force={0.6}
             duration={3000}
@@ -30,7 +30,7 @@ const GameRecapText = ({ choices }: { choices: Choice[] }) => {
           />
         </div>
       )}
-      <p className='text-2xl'>
+      <p className="text-2xl">
         You got {score} out of {choices.length} correct!
       </p>
     </div>

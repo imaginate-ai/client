@@ -1,6 +1,6 @@
-import { Flex } from 'antd';
-import { Choice } from '../../types/Image.types';
-import PhotoSelectorButton from './PhotoSelectorButton';
+import { Flex } from "antd";
+import { Choice } from "../../../../types/Image.types";
+import PhotoSelectorButton from "./PhotoSelectorButton";
 
 type PhotoCarouselProps = {
   choices: Choice[];
@@ -15,11 +15,11 @@ const PhotoSelector = ({
 }: PhotoCarouselProps) => {
   return (
     <Flex
-      justify='space-around'
-      align='center'
-      className='bg-gray-700 p-4 rounded-lg relative w-full'
-      style={{ minHeight: '80px' }}
-      gap={'0.5rem'}
+      justify="space-around"
+      align="center"
+      className="bg-gray-700 p-4 rounded-lg relative w-full"
+      style={{ minHeight: "80px" }}
+      gap={"0.5rem"}
     >
       {choices.map(({ isCorrect }, index, choices) => {
         const emoji = determineEmoji(index, choices);
@@ -36,13 +36,14 @@ const PhotoSelector = ({
           </PhotoSelectorButton>
         );
       })}
-      <div className='absolute top-1/2 transform -translate-y-1/2 z-0 h-1 bg-slate-200 w-full'></div>
+      <div className="absolute top-1/2 transform -translate-y-1/2 z-0 h-1 bg-slate-200 w-full">
+      </div>
     </Flex>
   );
 };
 
-const goodEmoji = ['🙂', '😌', '😋', '🤠', '🥳'];
-const badEmoji = ['🤨', '😟', '😓', '😭', '😵‍💫'];
+const goodEmoji = ["🙂", "😌", "😋", "🤠", "🥳"];
+const badEmoji = ["🤨", "😟", "😓", "😭", "😵‍💫"];
 
 // Determines the emoji to display based on the current index and choices
 // The emoji changes based on the number of correct and incorrect choices
