@@ -1,14 +1,14 @@
-import { animated, useTransition } from "@react-spring/web";
-import { Flex } from "antd";
-import { ReactElement, useContext, useEffect, useRef, useState } from "react";
-import { GameOverContext } from "@providers/gameOver.provider";
-import { getDayLastPlayed, getToday } from "@services/Day.service";
-import { getLastChoiceKeeper } from "@services/Choices.service";
-import { Choice } from "@local-types/Image.types";
-import { generateScoreHTML } from "@services/Score.service";
-import Game from "./Game/Game";
-import GameRecap from "./GameRecap/GameRecap";
-import { usePhotos } from "@hooks/photos.hook";
+import { animated, useTransition } from '@react-spring/web';
+import { Flex } from 'antd';
+import { ReactElement, useContext, useEffect, useRef, useState } from 'react';
+import { GameOverContext } from '@providers/gameOver.provider';
+import { getDayLastPlayed, getToday } from '@services/Day.service';
+import { getLastChoiceKeeper } from '@services/Choices.service';
+import { Choice } from '@local-types/Image.types';
+import { generateScoreHTML } from '@services/Score.service';
+import Game from './Game/Game';
+import GameRecap from './GameRecap/GameRecap';
+import { usePhotos } from '@hooks/photos.hook';
 
 const GameView = () => {
   const [photos] = usePhotos();
@@ -19,13 +19,8 @@ const GameView = () => {
     <>
       {transitions((style, shouldDisplayGame) => {
         return (
-          <animated.div className="h-full w-11/12" style={style}>
-            <Flex
-              align="center"
-              justify="center"
-              className="h-full "
-              vertical
-            >
+          <animated.div className='h-full w-11/12' style={style}>
+            <Flex align='center' justify='center' className='h-full ' vertical>
               {shouldDisplayGame !== null &&
                 (shouldDisplayGame ? <Game photos={photos} /> : <GameRecap />)}
             </Flex>
@@ -36,7 +31,7 @@ const GameView = () => {
   );
 };
 
-const useGameViewTransitions = (trigger: boolean | null) => {
+export const useGameViewTransitions = (trigger: boolean | null) => {
   return useTransition(trigger, {
     from: {
       opacity: 0,
@@ -68,8 +63,8 @@ const useShowGame = () => {
     const dayLastPlayed: number = getDayLastPlayed();
     const lastChoiceKeeper: Choice[] = getLastChoiceKeeper();
 
-    const hasPlayedToday = lastChoiceKeeper.length > 0 &&
-      dayLastPlayed === today;
+    const hasPlayedToday =
+      lastChoiceKeeper.length > 0 && dayLastPlayed === today;
 
     if (hasPlayedToday) {
       scoreText.current = generateScoreHTML(lastChoiceKeeper, today);
