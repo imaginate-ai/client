@@ -1,12 +1,12 @@
-import { JSX, ReactElement, useEffect, useRef, useState } from "react";
-import { Flex, Progress } from "antd";
-import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
-import GameButtons from "./GameButtons/GameButtons.tsx";
-import posthog from "posthog-js";
-import { Choice } from "../../../types/Image.types.ts";
-import { useGameOverContext } from "../../../providers/gameOver.provider.tsx";
-import { Image } from "../../../types/Image.types";
-import GamePhotoView from "./GamePhotoView/GamePhotoView.tsx";
+import { JSX, ReactElement, useEffect, useRef, useState } from 'react';
+import { Flex, Progress } from 'antd';
+import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
+import GameButtons from './GameButtons/GameButtons.tsx';
+import posthog from 'posthog-js';
+import { Choice } from '../../../types/Image.types.ts';
+import { useGameOverContext } from '../../../providers/gameOver.provider.tsx';
+import { Image } from '../../../types/Image.types';
+import GamePhotoView from './GamePhotoView/GamePhotoView.tsx';
 
 type GameProps = {
   photos: Image[] | undefined;
@@ -24,7 +24,7 @@ const Game = ({ photos }: GameProps): JSX.Element => {
 
   useEffect(() => {
     if (choiceKeeper.length) {
-      localStorage.setItem("last_choice_keeper", JSON.stringify(choiceKeeper));
+      localStorage.setItem('last_choice_keeper', JSON.stringify(choiceKeeper));
     }
   }, [choiceKeeper]);
 
@@ -34,8 +34,8 @@ const Game = ({ photos }: GameProps): JSX.Element => {
     if (isCorrectChoice) {
       setScore(score + 1);
       setFeedbackOverlay(
-        <div className="absolute w-full h-full content-center text-center bg-green-500">
-          <CheckOutlined className="text-9xl text-green-800" />
+        <div className='absolute w-full h-full content-center text-center bg-green-500'>
+          <CheckOutlined className='text-9xl text-green-800' />
         </div>,
       );
       setChoiceKeeper([
@@ -44,8 +44,8 @@ const Game = ({ photos }: GameProps): JSX.Element => {
       ]);
     } else {
       setFeedbackOverlay(
-        <div className=" absolute w-full h-full content-center text-center bg-red-500">
-          <CloseOutlined className="text-9xl text-red-800" />
+        <div className=' absolute w-full h-full content-center text-center bg-red-500'>
+          <CloseOutlined className='text-9xl text-red-800' />
         </div>,
       );
       setChoiceKeeper([
@@ -77,13 +77,28 @@ const Game = ({ photos }: GameProps): JSX.Element => {
     if (isGameOver) {
       setDisableButtons(true);
       const today = new Date().setHours(0, 0, 0, 0);
-      localStorage.setItem("day_last_played", today.toString());
-      posthog.capture("completed_game", {
+      localStorage.setItem('day_last_played', today.toString());
+      const currentGameStats = {
         score: score,
         length: photos!.length,
-        grade: score / photos!.length,
         day: today,
         theme: photos![0].theme,
+      };
+      const stats: {
+        games: Array<{
+          score: number;
+          length: number;
+          day: number;
+          theme: string;
+        }>;
+      } = JSON.parse(localStorage.getItem('stats') ?? '{}');
+      stats.games = stats.games
+        ? [...stats.games, currentGameStats]
+        : [currentGameStats];
+      localStorage.setItem('stats', JSON.stringify(stats));
+      posthog.capture('completed_game', {
+        ...currentGameStats,
+        grade: score / photos!.length,
       });
     }
   }, [isGameOver]);
@@ -91,28 +106,29 @@ const Game = ({ photos }: GameProps): JSX.Element => {
   return (
     <Flex
       ref={parentBox}
-      align="center"
-      justify="center"
-      className="w-full h-full"
-      style={{ maxWidth: "512px" }}
+      align='center'
+      justify='center'
+      className='w-full h-full'
+      style={{ maxWidth: '512px' }}
       vertical
     >
       <Progress
-        size={["100%", 10]}
-        percent={photos?.length
-          ? disableButtons ? 100 : (index / photos.length) * 100
-          : 0}
+        size={['100%', 10]}
+        percent={
+          photos?.length
+            ? disableButtons
+              ? 100
+              : (index / photos.length) * 100
+            : 0
+        }
         showInfo={false}
       />
       <GamePhotoView
         photo={photos?.[index]}
         feedbackOverlay={feedbackOverlay}
       />
-      <div className="w-full mb-32 mt-4">
-        <GameButtons
-          makeChoice={makeChoice}
-          disabled={disableButtons}
-        />
+      <div className='w-full mb-32 mt-4'>
+        <GameButtons makeChoice={makeChoice} disabled={disableButtons} />
       </div>
     </Flex>
   );
