@@ -1,14 +1,14 @@
-import { Flex } from "antd";
-import { Choice } from "src/types/Image.types";
-import PhotoCarousel from "./PhotoCarousel/PhotoCarousel";
-import ShareButton from "@components/ShareButton/ShareButton";
-import { useEffect, useMemo, useState } from "react";
-import { getToday } from "@services/Day.service";
-import { generateScoreText } from "@services/Score.service";
-import { animated, useSpring } from "@react-spring/web";
-import { recapAnimationTime } from "@app/constants/GameRecapConstants";
-import GameRecapText from "./GameRecapText";
-import { getLastChoiceKeeper } from "@services/Choices.service";
+import { Button, Flex } from 'antd';
+import { Choice } from 'src/types/Image.types';
+import ShareButton from '@components/ShareButton/ShareButton';
+import { useEffect, useMemo, useState } from 'react';
+import { getToday } from '@services/Day.service';
+import { generateScoreText } from '@services/Score.service';
+import { animated, useSpring } from '@react-spring/web';
+import { recapAnimationTime } from '@app/constants/GameRecapConstants';
+import { getLastChoiceKeeper } from '@services/Choices.service';
+import { BarChartOutlined, CameraOutlined } from '@ant-design/icons';
+import RecapContent from './RecapContent/RecapContent';
 
 const day = getToday();
 
@@ -17,19 +17,48 @@ const GameRecap = () => {
   const scoreText = useMemo(() => generateScoreText(choices, day), [choices]);
   const animations = useRecapAnimations();
 
+  const [showStats, setShowStats] = useState(false);
+
+  const secondaryButton = showStats ? (
+    <Button
+      className='p-8 text-xl rounded-full'
+      type='default'
+      key='shareButton'
+      onClick={() => setShowStats(false)}
+    >
+      <CameraOutlined />
+      View Photos
+    </Button>
+  ) : (
+    <Button
+      className='p-8 text-xl rounded-full'
+      type='default'
+      key='shareButton'
+      onClick={() => setShowStats(true)}
+    >
+      <BarChartOutlined />
+      View Stats
+    </Button>
+  );
+
   return (
-    <animated.div style={animations} className="w-full h-full">
+    <animated.div style={animations} className='w-full h-full'>
       <Flex
-        justify="center"
-        align="center"
-        className="text-center w-full h-full"
+        justify='center'
+        align='center'
+        className='text-center w-full h-full'
         vertical
       >
-        <GameRecapText choices={choices} />
-        <PhotoCarousel choices={choices} />
-        <div className="mt-8 mb-16">
+        <RecapContent choices={choices} showStats={showStats} />
+        <Flex
+          align='center'
+          justify='center'
+          gap={'16px'}
+          className='mt-8 mb-16 w-full'
+        >
           <ShareButton scoreText={scoreText} />
-        </div>
+          {secondaryButton}
+        </Flex>
       </Flex>
     </animated.div>
   );
@@ -50,9 +79,7 @@ const useChoiceKeeper = () => {
 
 const useRecapAnimations = () => {
   const translateAnimation = useSpring({
-    from: {
-      transform: `translateY(20px)`,
-    },
+    from: { transform: `translateY(20px)` },
     to: { transform: `translateY(0px)` },
     config: {
       duration: recapAnimationTime,
@@ -61,9 +88,7 @@ const useRecapAnimations = () => {
   });
 
   const opacityAnimation = useSpring({
-    from: {
-      opacity: 0,
-    },
+    from: { opacity: 0 },
     to: { opacity: 1 },
     config: {
       duration: recapAnimationTime,
