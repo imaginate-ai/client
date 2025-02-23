@@ -1,5 +1,4 @@
 import { Choice } from '@app/types/Image.types';
-import { useGameViewTransitions } from '../../GameView';
 import { animated, useTransition } from '@react-spring/web';
 import GameRecapText from '../GameRecapText';
 import PhotoCarousel from '../PhotoCarousel/PhotoCarousel';

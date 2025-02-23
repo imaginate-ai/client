@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import * as d3 from 'd3';
 
 interface HistogramProps {
@@ -59,7 +59,7 @@ const ScoreDistribution = ({
     g.selectAll('path')
       .data(bins)
       .enter()
-      .filter((d, i) => i < 5)
+      .filter((_d, i) => i < 5)
       .append('path')
       .attr('d', (d) => {
         const topY = y(d.x0 ?? 10) - barPadding / 2;
@@ -81,13 +81,13 @@ const ScoreDistribution = ({
       Z
       `;
       })
-      .attr('fill', (d, i) => colorScale[d.x0!]);
+      .attr('fill', (d) => colorScale[d.x0!]);
 
     // Add text labels inside the bars.
     g.selectAll('text')
       .data(bins)
       .enter()
-      .filter((d, i) => i < 5)
+      .filter((_d, i) => i < 5)
       .append('text')
       .attr('x', (d) => (d.length ? x(d.length) - 10 : widthForZeroBar - 10))
       .attr('y', (d) => (y(d.x0 ?? 0) + y(d.x1 ?? 0)) / 2)
