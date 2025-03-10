@@ -21,15 +21,19 @@ const ScoreDistribution = ({
     svg.selectAll('*').remove();
 
     // Adjust margins.
-    const margin = { top: 0, right: 0, bottom: 0, left: 30 };
+    const margin = { top: 0, right: 0, bottom: 0, left: 50 };
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
+
+    const yMin = 0;
+    const yMax = 5;
+    const domain: [number, number] = [yMin, yMax];
 
     // Original histogram bins over [0, 5].
     const binGenerator = d3
       .bin()
-      .domain([0, 5])
-      .thresholds(d3.range(0, 6, 1));
+      .domain(domain)
+      .thresholds(d3.range(yMin, yMax + 1, 1));
     const bins = binGenerator(data);
 
     // New x scale for counts.
@@ -37,10 +41,10 @@ const ScoreDistribution = ({
     const x = d3.scaleLinear().domain([0, xMax]).range([0, innerWidth]);
 
     // Keep y scale for bin intervals unchanged.
-    const y = d3.scaleLinear().domain([0, 5]).range([innerHeight, 0]);
+    const y = d3.scaleLinear().domain(domain).range([innerHeight, 0]);
 
     // Compute tick positions as the bin centers.
-    const yTickValues = d3.range(0, 5, 1).map((d) => d + 0.5);
+    const yTickValues = d3.range(yMin, yMax, 1).map((d) => d + 0.5);
 
     // Group for chart with proper margin.
     const g = svg
@@ -59,14 +63,13 @@ const ScoreDistribution = ({
     g.selectAll('path')
       .data(bins)
       .enter()
-      .filter((_d, i) => i < 5)
+      .filter((_d, i) => i < yMax)
       .append('path')
       .attr('d', (d) => {
         const topY = y(d.x0 ?? 10) - barPadding / 2;
         const bottomY = y(d.x1 ?? 20) + barPadding / 2;
         const barHeight = topY - bottomY;
         const barWidth = d.length ? x(d.length) : widthForZeroBar;
-        // Ensure the corner radius does not exceed half the width or height.
         const r = Math.min(cornerRadius, barWidth / 2, barHeight / 2);
         return `
       M ${r},${bottomY}
@@ -87,7 +90,7 @@ const ScoreDistribution = ({
     g.selectAll('text')
       .data(bins)
       .enter()
-      .filter((_d, i) => i < 5)
+      .filter((_d, i) => i < yMax)
       .append('text')
       .attr('x', (d) => (d.length ? x(d.length) - 10 : widthForZeroBar - 10))
       .attr('y', (d) => (y(d.x0 ?? 0) + y(d.x1 ?? 0)) / 2)
@@ -105,7 +108,7 @@ const ScoreDistribution = ({
         d3
           .axisLeft(y)
           .tickValues(yTickValues)
-          .tickFormat((d) => String(Math.floor(d as number) + 1))
+          .tickFormat((d) => String(Math.floor(d as number)))
           .tickSize(0),
       )
       .call((g) => g.select('.domain').remove())
