@@ -1,9 +1,9 @@
-import { Choice } from '@app/types/Image.types';
-import { animated, useTransition } from '@react-spring/web';
-import GameRecapText from '../GameRecapText';
-import PhotoCarousel from '../PhotoCarousel/PhotoCarousel';
-import Stats from '../Stats/Stats';
-import { Flex } from 'antd';
+import { Choice } from "@app/types/Image.types";
+import { animated, useTransition } from "@react-spring/web";
+import GameRecapText from "../GameRecapText";
+import PhotoCarousel from "../PhotoCarousel/PhotoCarousel";
+import Stats from "../Stats/Stats";
+import { Flex } from "antd";
 
 const RecapContent = ({
   choices,
@@ -17,17 +17,19 @@ const RecapContent = ({
   return (
     <>
       {viewTransition((style, shouldShowStats) => (
-        <animated.div className='flex-auto max-w-full max-h-full' style={style}>
-          {shouldShowStats ? (
-            <Flex className='w-full h-full' justify='center' align='center'>
-              <Stats />
-            </Flex>
-          ) : (
-            <div className='w-full h-full'>
-              <GameRecapText choices={choices} />
-              <PhotoCarousel choices={choices} />
-            </div>
-          )}
+        <animated.div className="max-w-full max-h-full" style={style}>
+          {shouldShowStats
+            ? (
+              <Flex className="w-full h-full" justify="center" align="center">
+                <Stats />
+              </Flex>
+            )
+            : (
+              <div className="w-full h-full">
+                <GameRecapText choices={choices} />
+                <PhotoCarousel choices={choices} />
+              </div>
+            )}
         </animated.div>
       ))}
     </>
