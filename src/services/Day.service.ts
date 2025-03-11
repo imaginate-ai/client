@@ -2,8 +2,12 @@ const START_DATE = new Date(2024, 8, 1).setHours(0, 0, 0, 0); //september 1st 20
 const MS_PER_DAY = 86400000;
 
 export const getToday = (): number => {
-  const today = new Date().setHours(0, 0, 0, 0);
+  const today = getDateToday();
   return calculateDayFromTimestamp(today);
+};
+
+export const getDateToday = (): number => {
+  return new Date().setHours(0, 0, 0, 0);
 };
 
 export const getDayLastPlayed = (): number => {

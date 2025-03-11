@@ -1,9 +1,9 @@
-import { Choice } from "../../../../types/Image.types";
-import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
-import { useEffect, useRef, useState } from "react";
-import { animated, useTransition } from "@react-spring/web";
-import PhotoSelector from "./PhotoSelector";
-import { Flex } from "antd";
+import { Choice } from '../../../../types/Image.types';
+import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
+import { useEffect, useRef, useState } from 'react';
+import { animated, useTransition } from '@react-spring/web';
+import PhotoSelector from './PhotoSelector';
+import { Flex } from 'antd';
 
 type PhotoCarouselProps = {
   choices: Choice[];
@@ -58,25 +58,24 @@ const PhotoCarousel = ({ choices }: PhotoCarouselProps) => {
   }, [isButtonClicked, choices]);
 
   const photos = choices.map(({ isCorrect: correct, image }) => {
-    const generatedText = image.real ? "real" : "AI";
-    const feedbackIconClasses = "text-6xl absolute bottom-6 right-6 z-10";
-    const feedbackIcon = correct
-      ? <CheckOutlined className={feedbackIconClasses + " text-green-600"} />
-      : <CloseOutlined className={feedbackIconClasses + " text-red-600"} />;
+    const generatedText = image.real ? 'real' : 'AI';
+    const feedbackIconClasses = 'text-6xl absolute bottom-6 right-6 z-10';
+    const feedbackIcon = correct ? (
+      <CheckOutlined className={feedbackIconClasses + ' text-green-600'} />
+    ) : (
+      <CloseOutlined className={feedbackIconClasses + ' text-red-600'} />
+    );
     return (
       <Flex
-        justify="center"
-        align="center"
+        className='w-full h-full'
+        justify='center'
+        align='center'
         vertical
-        className="w-full h-full"
         key={image.url}
       >
-        <div
-          style={{ maxHeight: "40svh" }}
-          className="relative flex-auto aspect-square m-4 rounded-lg rounded-lg overflow-hidden"
-        >
+        <div className='relative m-4 rounded-lg overflow-hidden'>
           <img
-            className=" object-contain w-full h-full"
+            className='object-contain'
             src={`data:image/png;base64,${image.data}`}
           />
           {feedbackIcon}
@@ -87,18 +86,15 @@ const PhotoCarousel = ({ choices }: PhotoCarouselProps) => {
   });
 
   return (
-    <Flex justify="center" align="center" className="w-full h-full" vertical>
+    <Flex justify='center' align='center' className='w-full h-full' vertical>
       {transitions((style, item) => {
         return (
-          <animated.div
-            className={"w-full h-full"}
-            style={style}
-          >
+          <animated.div className={'flex-auto'} style={style}>
             {photos[item]}
           </animated.div>
         );
       })}
-      <div className="max-w-lg mt-4">
+      <div className='max-w-lg mt-4'>
         <PhotoSelector
           choices={choices}
           clickHandler={onSelectNewPhotoIndex}
